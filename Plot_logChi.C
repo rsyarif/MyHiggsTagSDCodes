@@ -67,9 +67,9 @@ TH1F* makeHisto(std::string fname){
 }
 
 void Plot_logChi(){
-  TH1F *h = (TH1F*) makeHisto("RadionHH_M800_R12_r15_correctIVFmatch_mc_subjets.root");
-  TH1F *h2 = (TH1F*) makeHisto("TTJets_R12_r15_correctIVFmatch_mc_subjets.root");
-  TH1F *h3 = (TH1F*) makeHisto("QCD_Pt-470to600_TuneZ2star_8TeV_pythia6_R12_r15_correctIVFmatch_mc_subjets.root");
+  TH1F *h = (TH1F*) makeHisto("RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_mc_subjets.root");
+  TH1F *h2 = (TH1F*) makeHisto("TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_mc_subjets.root");
+  TH1F *h3 = (TH1F*) makeHisto("QCD_Pt-300to600_TuneZ2star_8TeV_pythia6_mc_subjets.root");
 
   TCanvas *c = new TCanvas("SD - log chi", "SD - log chi",800, 600);
   //c->SetGrid();
@@ -99,7 +99,7 @@ void Plot_logChi(){
   leg->SetBorderSize(0);
   leg->AddEntry(h,"Radion M800","L");
   leg->AddEntry(h2,"TTJets","L");
-  leg->AddEntry(h3,"QCD p_{T}470-600","L");
+  leg->AddEntry(h3,"QCD p_{T}300-600","L");
 
   leg->Draw("SAME");
 

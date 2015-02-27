@@ -431,9 +431,11 @@ void makeALLhisto1(){
   TCanvas *c = new TCanvas("SD studies","SD studies",800,600);
   c->SetGrid();
   c->SetLeftMargin(0.12);
-  TH1F *h = (TH1F*)  makeHisto1("","RadionHH_M800_R12_r15_correctIVFmatch_mc_subjets","FatJetInfo.nJet");
-  TH1F *h2 = (TH1F*)  makeHisto1("","TTJets_R12_r15_correctIVFmatch_mc_subjets","FatJetInfo.nJet");
-  TH1F *h3 = (TH1F*)  makeHisto1("","QCD_Pt-470to600_TuneZ2star_8TeV_pythia6_R12_r15_correctIVFmatch_mc_subjets","FatJetInfo.nJet");
+  TH1F *h = (TH1F*)  makeHisto1("","RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_mc_subjets","FatJetInfo.nJet");
+  TH1F *h2 = (TH1F*)  makeHisto1("","TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_mc_subjets","FatJetInfo.nJet");
+  TH1F *h3 = (TH1F*)  makeHisto1("","QCD_Pt-470to600_TuneZ2star_8TeV_pythia6_mc_subjets","FatJetInfo.nJet");
+  TH1F *h4 = (TH1F*)  makeHisto1("","QCD_Pt-300to470_TuneZ2star_8TeV_pythia6_mc_subjets","FatJetInfo.nJet");
+
   h->SetTitle("");
   h->SetLineColor(kBlue);
   h->SetMarkerColor(kRed);
@@ -443,8 +445,12 @@ void makeALLhisto1(){
   h3->SetTitle("");
   h3->SetLineColor(kGreen);
   h3->SetMarkerColor(kRed+2);
+  h4->SetTitle("");
+  h4->SetLineColor(kGreen+3);
+  h4->SetMarkerColor(kRed+1);
 
   h3->Draw("PL");
+  h4->Draw("PLSAME");
   h2->Draw("PLSAME");
   h->Draw("PLSAME");
 
@@ -454,6 +460,7 @@ void makeALLhisto1(){
   leg->AddEntry(h,"Radion M800","LP");
   leg->AddEntry(h2,"TTJets","LP");
   leg->AddEntry(h3,"QCD p_{T}470-600","LP");
+  leg->AddEntry(h4,"QCD p_{T}300-470","LP");
 
   leg->Draw();
 
@@ -466,20 +473,26 @@ void makeALLhisto2(){
   TCanvas *c = new TCanvas("SD studies - ratio","SD studies - ratio",800,600);
   c->SetGrid();
   c->SetLeftMargin(0.12);
-  TH1F *h = (TH1F*)  makeHisto2("","RadionHH_M800_R12_r15_correctIVFmatch_mc_subjets","FatJetInfo.nJet");
-  TH1F *h2 = (TH1F*)  makeHisto2("","TTJets_R12_r15_correctIVFmatch_mc_subjets","FatJetInfo.nJet");
-  TH1F *h3 = (TH1F*)  makeHisto2("","QCD_Pt-470to600_TuneZ2star_8TeV_pythia6_R12_r15_correctIVFmatch_mc_subjets","FatJetInfo.nJet");
+  TH1F *h = (TH1F*)  makeHisto2("","RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_mc_subjets","FatJetInfo.nJet");
+  TH1F *h2 = (TH1F*)  makeHisto2("","TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_mc_subjets","FatJetInfo.nJet");
+  TH1F *h3 = (TH1F*)  makeHisto2("","QCD_Pt-470to600_TuneZ2star_8TeV_pythia6_mc_subjets","FatJetInfo.nJet");
+  TH1F *h4 = (TH1F*)  makeHisto2("","QCD_Pt-300to470_TuneZ2star_8TeV_pythia6_mc_subjets","FatJetInfo.nJet");
+
   h->SetTitle("");
   h->SetLineColor(kBlue);
   h->SetMarkerColor(kRed);
-  h3->SetTitle("");
+  h2->SetTitle("");
   h2->SetLineColor(kBlue+3);
   h2->SetMarkerColor(kRed+3);
   h3->SetTitle("");
   h3->SetLineColor(kGreen);
   h3->SetMarkerColor(kRed+2);
+  h4->SetTitle("");
+  h4->SetLineColor(kGreen+3);
+  h4->SetMarkerColor(kRed+1);
 
   h3->Draw("PL");
+  h4->Draw("PLSAME");
   h2->Draw("PLSAME");
   h->Draw("PLSAME");
 
@@ -489,6 +502,7 @@ void makeALLhisto2(){
   leg->AddEntry(h,"Radion M800","LP");
   leg->AddEntry(h2,"TTJets","LP");
   leg->AddEntry(h3,"QCD p_{T}470-600","LP");
+  leg->AddEntry(h4,"QCD p_{T}300-470","LP");
 
   leg->Draw();
 
