@@ -109,3 +109,38 @@ void Plot_logChi(){
 
 }
 
+void Plot_logChi_1leadbtagcondition(){
+  TH1F *h = (TH1F*) makeHisto("1leadbtagmjcondition/RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets.root");
+  TH1F *h2 = (TH1F*) makeHisto("1leadbtagmjcondition/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets.root");
+
+  TCanvas *c = new TCanvas("SD - log chi", "SD - log chi",800, 600);
+  //c->SetGrid();
+
+  Double_t norm1 = h->GetEntries();
+  h->Scale(1/norm1);
+  Double_t norm2 = h2->GetEntries();
+  h2->Scale(1/norm2);
+
+  gStyle->SetOptStat(0);
+
+  h->SetTitle("");
+  h->SetLineColor(kBlue);
+  h->Draw();
+
+  h2->SetLineColor(kRed);
+  h2->Draw("SAME");
+
+  leg = new TLegend(0.65,0.65,0.85,0.85);
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+  leg->AddEntry(h,"Radion M800","L");
+  leg->AddEntry(h2,"TTJets","L");
+
+  leg->Draw("SAME");
+
+  c->SaveAs("1leadbtagmjcondition/Plot_logChi_1leadbtagmjcondition_All.eps");
+  c->SetLogy();
+  c->SaveAs("1leadbtagmjcondition/Plot_logChi_1leadbtagmjcondition_All_logyscale.eps");
+
+}
+
