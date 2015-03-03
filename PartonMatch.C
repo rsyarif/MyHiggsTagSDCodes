@@ -1,7 +1,7 @@
 
 using namespace std;
 
-TH2D* PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax = 1.2, int xbin =50, double xmin = -18, double xmax = -2, int ybin = 50, double ymin =0, double ymax =0.6,bool display=false, bool save=false){
+TH2D* PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax = 1.2, int xbin =50, double xmin = -18, double xmax = -2, int ybin = 50, double ymin =0, double ymax =0.6,bool display=false, bool save=false, std::string postfix = ""){
 
   TFile *f = new TFile((fdir+"/"+fname+".root").c_str());
 
@@ -23,6 +23,8 @@ TH2D* PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRma
   int GenPruned_pdgID[nGenPrunedMax];
   float GenPruned_eta[nGenPrunedMax]; //simple hack to avoid making different size arrays every event loop. Run calcMax.C
   float GenPruned_phi[nGenPrunedMax];
+  float GenPruned_pT[nGenPrunedMax];
+
 
   int nFj;
   const int nFjMax=5;
@@ -34,6 +36,7 @@ TH2D* PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRma
   t->SetBranchAddress("GenPruned_pdgID",&GenPruned_pdgID);
   t->SetBranchAddress("GenPruned_eta",&GenPruned_eta);
   t->SetBranchAddress("GenPruned_phi",&GenPruned_phi);
+  t->SetBranchAddress("GenPruned_pT",&GenPruned_pT);
 
   tf->SetBranchAddress("FatJetInfo.nJet",&nFj);
   tf->SetBranchAddress("FatJetInfo.Jet_eta",&Fj_eta);
@@ -74,7 +77,7 @@ TH2D* PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRma
 	    if(display)cout<<"----> MATCH!! " << endl;
 	    nMatch++;
 
-	    if(Fj_chi[j]>0) h->Fill(log(Fj_chi[j]),dR); //fill 2D histo (chi, dR)
+	    if(Fj_chi[j]>0 && GenPruned_pT[k]>200 ) h->Fill(log(Fj_chi[j]),dR); //fill 2D histo (chi, dR)
 
 	  }
 
@@ -113,13 +116,13 @@ TH2D* PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRma
   c2->SetRightMargin(0.3);
   h->Draw("LEGO2Z");
 
-  if(save)c->SaveAs((fdir+"/"+fname+"_fjGenPartilcleMatch_COLZ.eps").c_str());
-  if(save)c2->SaveAs((fdir+"/"+fname+"_fjGenParticleMatch_LEGO2Z.eps").c_str());
+  if(save)c->SaveAs((fdir+"/"+fname+"_"+postfix+"_fjGenPartilcleMatch_COLZ.eps").c_str());
+  if(save)c2->SaveAs((fdir+"/"+fname+"_"+postfix+"_fjGenParticleMatch_LEGO2Z.eps").c_str());
 
   return h;
 }
 
-TH1D* PartonMatch_ProjectX(TH2D* h2,bool save=false){
+TH1D* PartonMatch_ProjectX(TH2D* h2, std::string fdir, std::string fname, bool save=false, std::string postfix = ""){
   TCanvas *c3 = new TCanvas("c3","c3",800,600);
   TH1D *h = h2->ProjectionX();
   c3->cd();
@@ -133,7 +136,7 @@ TH1D* PartonMatch_ProjectX(TH2D* h2,bool save=false){
   h->SetTitle("");
   h->Draw();
 
-  if(save)c3->SaveAs((fdir+"/"+fname+"_fjGenPartilcleMatch_ProjectX.eps").c_str());
+  if(save)c3->SaveAs((fdir+"/"+fname+"_"+postfix+"_fjGenPartilcleMatch_ProjectX.eps").c_str());
 
   return h;
 }
@@ -151,26 +154,27 @@ double deltaR(double eta1, double phi1, double eta2, double phi2){
 }
 
 void PartonMatch(){
-  //before
-  TH2D* h2_bkg = PartonMatch("1leadbtagmjcondition","TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets",6,1.2,50,-18,-2,50,0,1.2,false,true);
-  TH1D* h_bkg = PartonMatch_ProjectX(h2_bkg);
-  TH2D* h2_sig = PartonMatch("1leadbtagmjcondition","RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets",25,1.2,50,-18,-2,50,0,1.2,false,true);
-  TH1D* h_sig = PartonMatch_ProjectX(h2_sig);
+  //loose match
+  TH2D* h2_bkg = PartonMatch("1leadbtagmjcondition","TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets",6,1.2,50,-18,-2,50,0,1.2,false,true,"dRmax12");
+  TH1D* h_bkg = PartonMatch_ProjectX(h2_bkg,"1leadbtagmjcondition","TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets",true,"dRmax12");
 
-  //after
-  TH2D* h2_bkg2 = PartonMatch("1leadbtagmjcondition","TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets",6,0.2,40,-18,-2,40,0,0.2,false,false);
-  TH1D* h_bkg2 = PartonMatch_ProjectX(h2_bkg2);
-  TH2D* h2_sig2 = PartonMatch("1leadbtagmjcondition","RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets",25,0.05,40,-18,-2,40,0,0.1,false,false);
-  TH1D* h_sig2 = PartonMatch_ProjectX(h2_sig2);
+TH2D* h2_sig = PartonMatch("1leadbtagmjcondition","RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets",25,1.2,50,-18,-2,50,0,1.2,false,true,"dRmax12");
+  TH1D* h_sig = PartonMatch_ProjectX(h2_sig,"1leadbtagmjcondition","RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets",true,"dRmax12");
+
+  //tight match
+  TH2D* h2_bkg2 = PartonMatch("1leadbtagmjcondition","TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets",6,0.2,40,-18,-2,40,0,0.2,false,true,"dRmax02");
+  TH1D* h_bkg2 = PartonMatch_ProjectX(h2_bkg2,"1leadbtagmjcondition","TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets",true,"dRmax02");
+
+TH2D* h2_sig2 = PartonMatch("1leadbtagmjcondition","RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets",25,0.05,40,-18,-2,40,0,0.1,false,true,"dRmax005");
+  TH1D* h_sig2 = PartonMatch_ProjectX(h2_sig2,"1leadbtagmjcondition","RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets",true,"dRmax005");
 
   TCanvas* canvas = new TCanvas("B4 matching","B4 matching",800,600);
   TCanvas* canvas2 = new TCanvas("After matching","After matching",800,600);
 
   canvas->cd();
 
-  gStyle->SetOptStat(0);
-  //h->GetXaxis()->SetTitle("Log(#chi)");
-  //h->SetLineWidth(2);
+  h_sig->SetStats(0);
+  h_bkg->SetStats(0);
   h_sig->SetLineColor(kBlue);
   h_bkg->SetLineColor(kRed);
   //h->GetXaxis()->SetTitleOffset(1.3);
@@ -193,14 +197,11 @@ void PartonMatch(){
 
   canvas2->cd();
 
-  gStyle->SetOptStat(0);
-  //h->GetXaxis()->SetTitle("Log(#chi)");
-  //h->SetLineWidth(2);
+  h_sig2->SetStats(0);
+  h_bkg2->SetStats(0);
   h_sig2->SetLineColor(kBlue);
   h_bkg2->SetLineColor(kRed);
-  //h->GetXaxis()->SetTitleOffset(1.3);
-  //h->GetYaxis()->SetTitle("Entries");
-  //h->SetTitle("");
+
   norm1 = h_sig2->GetEntries();
   h_sig2->Scale(1/norm1);
   norm2 = h_bkg2->GetEntries();
