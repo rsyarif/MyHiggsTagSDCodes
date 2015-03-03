@@ -114,20 +114,39 @@ void Plot_logChi_1leadbtagcondition(){
   TH1F *h2 = (TH1F*) makeHisto("1leadbtagmjcondition/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets.root");
 
   TCanvas *c = new TCanvas("SD - log chi", "SD - log chi",800, 600);
+  TCanvas *c2 = new TCanvas("SD - log chi - sig", "SD - log chi - sig",800, 600);
+  TCanvas *c3 = new TCanvas("SD - log chi - bkg", "SD - log chi - bkg",800, 600);
+
+  gStyle->SetOptStat("nemrou");
+
+  h->SetStats(1);
+  h2->SetStats(1);
+
+  c2->cd();
+  h->SetLineColor(kBlue);
+  h->Draw();
+  c2->SaveAs("1leadbtagmjcondition/Plot_logChi_1leadbtagmjcondition_sig.eps");
+
+
+  c3->cd();
+  h2->SetLineColor(kRed);
+  h2->Draw();
+  c3->SaveAs("1leadbtagmjcondition/Plot_logChi_1leadbtagmjcondition_bkg.eps");
+
   //c->SetGrid();
+  c->cd();
 
   Double_t norm1 = h->GetEntries();
   h->Scale(1/norm1);
   Double_t norm2 = h2->GetEntries();
   h2->Scale(1/norm2);
 
-  gStyle->SetOptStat(0);
+  h->SetStats(0);
+  h2->SetStats(0);
 
   h->SetTitle("");
-  h->SetLineColor(kBlue);
-  h->Draw();
 
-  h2->SetLineColor(kRed);
+  h->Draw();
   h2->Draw("SAME");
 
   leg = new TLegend(0.65,0.65,0.85,0.85);
