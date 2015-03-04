@@ -1,64 +1,19 @@
-//#include <iostream>
-//#include <math.h>
-//#include "TROOT.h"
-//#include "TFile.h"
-//#include "TTree.h"
-//#include "TH1F.h"
-//#include "TCanvas.h"
 
-using namespace std;
-
-double deltaR(double eta1, double phi1, double eta2, double phi2){
-  double dEta = eta1 - eta2;
-
-  double dPhi = phi1 - phi2;
-  while (dPhi > TMath::Pi()) dPhi -= 2*TMath::Pi();
-  while (dPhi <= -TMath::Pi()) dPhi += 2*TMath::Pi();
-
-  double dR = sqrt(dEta*dEta + dPhi*dPhi);
-  return dR;
-}
-
-
-TH1F* makeHisto(std::string fname){
-  //{
+TH1F* makeHisto(std::string dir, std::string fname, std::string var, std::string cut, double bin, double min, double max){
   bool display = 0;
-
-  //TFile *f = new TFile("RadionHH_M800_R12_r15_correctIVFmatch_mc_subjets.root");
-  TFile *f = new TFile((fname).c_str());
+  TFile *f = new TFile((dir+"/"+fname+".root").c_str());
   TDirectoryFile *df = f->GetDirectory("btaganaSubJets");
   TTree *tf = df->Get("ttree");
 
-  //TCanvas *c = new TCanvas("c","SD fatjet higgs matching",800,600);
-  TH1F *h = new TH1F(fname.c_str(),fname.c_str(),50,-18,-2);
+  TH1F *h = new TH1F(fname.c_str(),fname.c_str(),bin,min,max);
 
-  const int nEvent = tf->GetEntries();
-
-  int nFj;
-  const int nFjMax=8;
-  float Fj_chi[nFjMax];
-
-  tf->SetBranchAddress("FatJetInfo.nJet",&nFj);
-  tf->SetBranchAddress("FatJetInfo.Jet_SD_chi",&Fj_chi);
-
-  //loop over events
-  if(display)cout << endl;
-  for (int i =0 ; i<nEvent;i++){
-    //for (int i =0 ; i<2;i++){
-    tf->GetEntry(i);
-    //loop over fatjets
-    for(int j=0; j < nFj; j++){
-      if(display)cout<< "           "<<     "    Fatjet_chi = " << Fj_chi[j] << endl;
-      if(Fj_chi[j]>0) h->Fill(log(Fj_chi[j])); //fill 2D histo (chi, dR)
-    }//end fatjet loop
-
-  }//end event loop
+  tf->Draw((var+">>"+fname).c_str(),cut.c_str());
 
   gStyle->SetOptStat("nemrou");
   h->SetLineColor(kBlue);
   h->SetLineWidth(2);
   h->GetXaxis()->SetTitle("log(#chi)");
-  h->GetXaxis()->SetTitleOffset(1.3);
+  h->GetXaxis()->SetTitleOffset(1.2);
   h->GetYaxis()->SetTitle("Entries");
   h->GetYaxis()->SetTitleOffset(1.2);
   h->SetTitle("");
@@ -66,7 +21,8 @@ TH1F* makeHisto(std::string fname){
   return h;
 }
 
-void Plot_logChi(){
+void Plot_logChi_old(){
+
   TH1F *h = (TH1F*) makeHisto("RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_mc_subjets.root");
   TH1F *h2 = (TH1F*) makeHisto("TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_mc_subjets.root");
   TH1F *h3 = (TH1F*) makeHisto("QCD_Pt-300to600_TuneZ2star_8TeV_pythia6_mc_subjets.root");
@@ -110,8 +66,14 @@ void Plot_logChi(){
 }
 
 void Plot_logChi_1leadbtagcondition(){
-  TH1F *h = (TH1F*) makeHisto("1leadbtagmjcondition/RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets.root");
-  TH1F *h2 = (TH1F*) makeHisto("1leadbtagmjcondition/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets.root");
+  std::string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets" ;
+  std::string fbkg = "TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets" ;
+  std::string dir = "1leadbtagmjcondition";
+  std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0";
+  std::string var = "log(FatJetInfo.Jet_SD_chi)";
+
+  TH1F *h = (TH1F*) makeHisto(dir.c_str(),fsig.c_str(),var.c_str(),cut.c_str(),50,-18,2);
+  TH1F *h2 = (TH1F*) makeHisto(dir.c_str(),fbkg.c_str(),var.c_str(),cut.c_str(),50,-18,2);
 
   TCanvas *c = new TCanvas("SD - log chi", "SD - log chi",800, 600);
   TCanvas *c2 = new TCanvas("SD - log chi - sig", "SD - log chi - sig",800, 600);
@@ -125,13 +87,76 @@ void Plot_logChi_1leadbtagcondition(){
   c2->cd();
   h->SetLineColor(kBlue);
   h->Draw();
-  c2->SaveAs("1leadbtagmjcondition/Plot_logChi_1leadbtagmjcondition_sig.eps");
+  c2->SaveAs((dir+"/Plot_logChi_1leadbtagmjcondition_sig.eps").c_str());
 
 
   c3->cd();
   h2->SetLineColor(kRed);
   h2->Draw();
-  c3->SaveAs("1leadbtagmjcondition/Plot_logChi_1leadbtagmjcondition_bkg.eps");
+  c3->SaveAs((dir+"/Plot_logChi_1leadbtagmjcondition_bkg.eps").c_str());
+
+  c->SetGrid();
+  c->cd();
+
+  Double_t norm1 = h->GetEntries();
+  h->Scale(1/norm1);
+  Double_t norm2 = h2->GetEntries();
+  h2->Scale(1/norm2);
+
+  h->SetStats(0);
+  h2->SetStats(0);
+
+  h->SetTitle("");
+
+  h->Draw();
+  h2->Draw("SAME");
+
+  leg = new TLegend(0.65,0.65,0.85,0.85);
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+  leg->AddEntry(h,"Radion M800","L");
+  leg->AddEntry(h2,"TTJets","L");
+
+  leg->Draw("SAME");
+
+  c->SaveAs((dir+"Plot_logChi_1leadbtagmjcondition_All.eps").c_str());
+  c->SetLogy();
+  c->SaveAs((dir+"/Plot_logChi_1leadbtagmjcondition_All_logyscale.eps").c_str());
+
+}
+
+void Plot_logChi_noMinFatjetPt_noMjBtagCondition(){
+  std::string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_mc_subjets" ;
+  std::string fbkg = "TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_mc_subjets" ;
+  std::string dir = "noMinFatjetPt_noMjBtagCondition";
+  //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0";
+  //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_SD_isLeadMicrojetBtag>0";
+  //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_SD_isLeadMicrojetBtag>0&&FatJetInfo.Jet_pt>200";
+  std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_SD_isLeadMicrojetBtag>0&&FatJetInfo.Jet_pt>200&&FatJetInfo.Jet_SD_nBtagMicrojets>1";
+  std::string var = "log(FatJetInfo.Jet_SD_chi)";
+
+  TH1F *h = (TH1F*) makeHisto(dir.c_str(),fsig.c_str(),var.c_str(),cut.c_str(),50,-18,-2);
+  TH1F *h2 = (TH1F*) makeHisto(dir.c_str(),fbkg.c_str(),var.c_str(),cut.c_str(),50,-18,-2);
+
+  TCanvas *c = new TCanvas("SD - log chi", "SD - log chi",800, 600);
+  TCanvas *c2 = new TCanvas("SD - log chi - sig", "SD - log chi - sig",800, 600);
+  TCanvas *c3 = new TCanvas("SD - log chi - bkg", "SD - log chi - bkg",800, 600);
+
+  gStyle->SetOptStat("nemrou");
+
+  h->SetStats(1);
+  h2->SetStats(1);
+
+  c2->cd();
+  h->SetLineColor(kBlue);
+  h->Draw();
+  c2->SaveAs((dir+"/Plot_logChi_noMinFatjetPt_noMjBtagCondition_sig.eps").c_str());
+
+
+  c3->cd();
+  h2->SetLineColor(kRed);
+  h2->Draw();
+  c3->SaveAs((dir+"/Plot_logChi_noMinFatjetPt_noMjBtagCondition_bkg.eps").c_str());
 
   //c->SetGrid();
   c->cd();
@@ -157,9 +182,10 @@ void Plot_logChi_1leadbtagcondition(){
 
   leg->Draw("SAME");
 
-  c->SaveAs("1leadbtagmjcondition/Plot_logChi_1leadbtagmjcondition_All.eps");
+  c->SaveAs((dir+"/Plot_logChi_noMinFatjetPt_noMjBtagCondition_All.eps").c_str());
   c->SetLogy();
-  c->SaveAs("1leadbtagmjcondition/Plot_logChi_1leadbtagmjcondition_All_logyscale.eps");
+  c->SaveAs((dir+"/Plot_logChi_noMinFatjetPt_noMjBtagCondition_All_logyscale.eps").c_str());
 
 }
+
 
