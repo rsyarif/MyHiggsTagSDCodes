@@ -142,7 +142,7 @@ TH1D* PartonMatch_ProjectX(TH2D* h2, std::string fdir, std::string fname, bool s
   h->SetTitle("");
   h->Draw();
 
-  if(save)c3->SaveAs((fdir+"/"+fname+"_"+postfix+"_fjGenPartilcleMatch_ProjectX.eps").c_str());
+  if(save)c3->SaveAs((fdir+"/"+fname+"_"+postfix+"_fjGenParticleMatch_ProjectX.eps").c_str());
 
   return h;
 }

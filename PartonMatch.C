@@ -25,12 +25,14 @@ TH2D* PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRma
   float GenPruned_phi[nGenPrunedMax];
   float GenPruned_pT[nGenPrunedMax];
 
-
   int nFj;
   const int nFjMax=5;
   float Fj_eta[nFjMax];
   float Fj_phi[nFjMax];
   float Fj_chi[nFjMax];
+  float Fj_pt[nFjMax];
+  int Fj_nbMj[nFjMax];
+  //int Fj_isleadMjbtag[nFjMax];
 
   t->SetBranchAddress("nGenPruned",&nGenPruned);
   t->SetBranchAddress("GenPruned_pdgID",&GenPruned_pdgID);
@@ -42,6 +44,9 @@ TH2D* PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRma
   tf->SetBranchAddress("FatJetInfo.Jet_eta",&Fj_eta);
   tf->SetBranchAddress("FatJetInfo.Jet_phi",&Fj_phi);
   tf->SetBranchAddress("FatJetInfo.Jet_SD_chi",&Fj_chi);
+  tf->SetBranchAddress("FatJetInfo.Jet_pt",&Fj_pt);
+  tf->SetBranchAddress("FatJetInfo.Jet_SD_nBtagMicrojets",&Fj_nbMj);
+  //tf->SetBranchAddress("FatJetInfo.Jet_SD_isLeadMicrojetBtag",&Fj_isleadMjbtag);
 
   cout << endl;
   cout << "Matching fatjets in "<< fname << ", with pdgid = " << gen_pdgid << endl;
@@ -76,8 +81,8 @@ TH2D* PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRma
 	  if(dR<dRmax){
 	    if(display)cout<<"----> MATCH!! " << endl;
 	    nMatch++;
-
-	    if(Fj_chi[j]>0 && GenPruned_pT[k]>200 ) h->Fill(log(Fj_chi[j]),dR); //fill 2D histo (chi, dR)
+	    //Determine Cuts conditions
+	    if(Fj_chi[j]>0 && GenPruned_pT[k]>200) h->Fill(log(Fj_chi[j]),dR); //fill 2D histo (chi, dR)
 
 	  }
 
@@ -136,7 +141,7 @@ TH1D* PartonMatch_ProjectX(TH2D* h2, std::string fdir, std::string fname, bool s
   h->SetTitle("");
   h->Draw();
 
-  if(save)c3->SaveAs((fdir+"/"+fname+"_"+postfix+"_fjGenPartilcleMatch_ProjectX.eps").c_str());
+  if(save)c3->SaveAs((fdir+"/"+fname+"_"+postfix+"_fjGenParticleMatch_ProjectX.eps").c_str());
 
   return h;
 }
