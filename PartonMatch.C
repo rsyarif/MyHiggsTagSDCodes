@@ -48,11 +48,19 @@ TH2D* PartonMatch(std::string fdir, std::string fname, std::string var = "dR", i
   tf->SetBranchAddress("FatJetInfo.Jet_SD_nBtagMicrojets",&FatJetInfo_Jet_SD_nBtagMicrojets);
   //tf->SetBranchAddress("FatJetInfo.Jet_SD_isLeadMicrojetBtag",&Fj_isleadMjbtag);
 
-  //TESTING -start
-  TFile *fTEMP = new TFile(("fTEMP_"+fname+"_"+postfix+".root").c_str(),"RECREATE");
-  TTree *tr_temp = new TTree("tree","tree");
-  tr_temp->Branch("FatJetInfo.Jet_SD_chi",FatJetInfo_Jet_SD_chi,"FatJetInfo_Jet_SD_chi/F");
-  //TESTING -end
+  float dR_match;
+  float Fj_chi;
+  float Fj_pt;
+  float gen_pt;
+  int Fj_nBtagMj;
+  TFile *fMatch = new TFile((fdir+"/"+"fMatch_"+fname+"_"+postfix+".root").c_str(),"RECREATE");
+  TTree *tr_new = new TTree("tree","tree");
+  tr_new->Branch("dR_match",&dR_match,"dR_match/F");
+  tr_new->Branch("Fj_chi",&Fj_chi,"Fj_chi/F");
+  tr_new->Branch("Fj_pt",&Fj_pt,"Fj_pt/F");
+  tr_new->Branch("gen_pt",&gen_pt,"gen_pt/F");
+  tr_new->Branch("Fj_nBtagMj",&Fj_nBtagMj,"Fj_nBtagMj/I");
+
 
   cout << endl;
   cout << "Matching fatjets in "<< fname << ", with pdgid = " << gen_pdgid << endl;
@@ -90,7 +98,14 @@ TH2D* PartonMatch(std::string fdir, std::string fname, std::string var = "dR", i
 	    //Determine Cuts conditions
 	    if(GenPruned_pT[k]<=200)continue;
 	    if(FatJetInfo_Jet_SD_chi[j]>0 && FatJetInfo_Jet_pt[j]>200){
-	      tr_temp->Fill();
+
+	      dR_match = dR;
+	      Fj_chi = FatJetInfo_Jet_SD_chi[j];
+	      gen_pt = GenPruned_pT[k];
+	      Fj_pt = FatJetInfo_Jet_pt[j];
+	      Fj_nBtagMj = FatJetInfo_Jet_SD_nBtagMicrojets[j];
+	      tr_new->Fill();
+
 	      if(var == "dR") h->Fill(log(FatJetInfo_Jet_SD_chi[j]),dR); //fill 2D histo (chi, dR)
 	      else if(var == "FatJetInfo_Jet_pt") h->Fill(log(FatJetInfo_Jet_SD_chi[j]),FatJetInfo_Jet_pt[j]); //fill 2D histo (chi, dR)
 	      else if(var == "GenPruned_pT") h->Fill(log(FatJetInfo_Jet_SD_chi[j]),GenPruned_pT[k]); //fill 2D histo (chi, dR)
@@ -111,9 +126,9 @@ TH2D* PartonMatch(std::string fdir, std::string fname, std::string var = "dR", i
     if (nMatch>2) iEventOverMatch.push_back(i);
 
   }//end event loop
-  tr_temp->Print();
-  fTEMP->cd();
-  tr_temp->Write();
+  tr_new->Print();
+  fMatch->cd();
+  tr_new->Write();
 
   if(display)cout << "nMatchMax =" << nMatchMax << endl;
   if(display)cout << "nEventOverMatch = " << iEventOverMatch.size() << " (events more than 2 matches)" <<endl;
@@ -221,7 +236,7 @@ void PartonMatch(){
   TCanvas* canvas4 = new TCanvas("sig matching","sig matching",800,600);
   TCanvas* canvas5 = new TCanvas("bkg matching","bkg matching",800,600);
 
-  TFile *fhistos = new TFile("histos_TEMP.root","RECREATE");
+  TFile *fhistos = new TFile((dir+"/"+"PartonMatch_histos.root").c_str(),"RECREATE");
 
   h_sig_l->SetStats(1);
   h_sig_m->SetStats(1);
