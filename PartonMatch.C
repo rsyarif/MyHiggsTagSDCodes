@@ -48,6 +48,12 @@ TH2D* PartonMatch(std::string fdir, std::string fname, std::string var = "dR", i
   tf->SetBranchAddress("FatJetInfo.Jet_SD_nBtagMicrojets",&FatJetInfo_Jet_SD_nBtagMicrojets);
   //tf->SetBranchAddress("FatJetInfo.Jet_SD_isLeadMicrojetBtag",&Fj_isleadMjbtag);
 
+  //TESTING -start
+  TFile *fTEMP = new TFile(("fTEMP_"+fname+"_"+postfix+".root").c_str(),"RECREATE");
+  TTree *tr_temp = new TTree("tree","tree");
+  tr_temp->Branch("FatJetInfo.Jet_SD_chi",FatJetInfo_Jet_SD_chi,"FatJetInfo_Jet_SD_chi/F");
+  //TESTING -end
+
   cout << endl;
   cout << "Matching fatjets in "<< fname << ", with pdgid = " << gen_pdgid << endl;
   cout << endl;
@@ -84,6 +90,7 @@ TH2D* PartonMatch(std::string fdir, std::string fname, std::string var = "dR", i
 	    //Determine Cuts conditions
 	    if(GenPruned_pT[k]<=200)continue;
 	    if(FatJetInfo_Jet_SD_chi[j]>0 && FatJetInfo_Jet_pt[j]>200){
+	      tr_temp->Fill();
 	      if(var == "dR") h->Fill(log(FatJetInfo_Jet_SD_chi[j]),dR); //fill 2D histo (chi, dR)
 	      else if(var == "FatJetInfo_Jet_pt") h->Fill(log(FatJetInfo_Jet_SD_chi[j]),FatJetInfo_Jet_pt[j]); //fill 2D histo (chi, dR)
 	      else if(var == "GenPruned_pT") h->Fill(log(FatJetInfo_Jet_SD_chi[j]),GenPruned_pT[k]); //fill 2D histo (chi, dR)
@@ -104,6 +111,9 @@ TH2D* PartonMatch(std::string fdir, std::string fname, std::string var = "dR", i
     if (nMatch>2) iEventOverMatch.push_back(i);
 
   }//end event loop
+  tr_temp->Print();
+  fTEMP->cd();
+  tr_temp->Write();
 
   if(display)cout << "nMatchMax =" << nMatchMax << endl;
   if(display)cout << "nEventOverMatch = " << iEventOverMatch.size() << " (events more than 2 matches)" <<endl;
@@ -134,6 +144,7 @@ TH2D* PartonMatch(std::string fdir, std::string fname, std::string var = "dR", i
   if(save)c2->SaveAs((fdir+"/"+fname+"_"+postfix+"_fjGenParticleMatch_LEGO2Z.eps").c_str());
 
   return h;
+
 }
 
 TH1D* PartonMatch_ProjectX(TH2D* h2, std::string fdir, std::string fname, bool save=false, std::string postfix = ""){
@@ -210,6 +221,35 @@ void PartonMatch(){
   TCanvas* canvas4 = new TCanvas("sig matching","sig matching",800,600);
   TCanvas* canvas5 = new TCanvas("bkg matching","bkg matching",800,600);
 
+  TFile *fhistos = new TFile("histos_TEMP.root","RECREATE");
+
+  h_sig_l->SetStats(1);
+  h_sig_m->SetStats(1);
+  h_sig_t->SetStats(1);
+
+  h_bkg_l->SetStats(1);
+  h_bkg_m->SetStats(1);
+  h_bkg_t->SetStats(1);
+
+  gStyle->SetOptStat("nemrou");
+  gPad->Update();
+
+  h2_sig_l->Write("h2_sig_l");
+  h2_sig_m->Write("h2_sig_m");
+  h2_sig_t->Write("h2_sig_t");
+
+  h_sig_l->Write("h_sig_l");
+  h_sig_m->Write("h_sig_m");
+  h_sig_t->Write("h_sig_t");
+
+  h2_bkg_l->Write("h2_bkg_l");
+  h2_bkg_m->Write("h2_bkg_m");
+  h2_bkg_t->Write("h2_bkg_t");
+
+  h_bkg_l->Write("h_bkg_l");
+  h_bkg_m->Write("h_bkg_m");
+  h_bkg_t->Write("h_bkg_t");
+
   canvas->cd();
 
   h_sig_l->SetStats(0);
@@ -219,6 +259,7 @@ void PartonMatch(){
   //h->GetXaxis()->SetTitleOffset(1.3);
   //h->GetYaxis()->SetTitle("Entries");
   //h->SetTitle("");
+
   Double_t norm1;
   Double_t norm2;
 
@@ -233,6 +274,7 @@ void PartonMatch(){
   gPad->Update();
 
   canvas->SaveAs("1leadbtagmjcondition/loose_match.eps");
+  canvas->Write();
 
   canvas2->cd();
 
@@ -252,6 +294,7 @@ void PartonMatch(){
   gPad->Update();
 
   canvas2->SaveAs("1leadbtagmjcondition/medium_match.eps");
+  canvas2->Write();
 
   canvas3->cd();
 
@@ -271,6 +314,7 @@ void PartonMatch(){
   gPad->Update();
 
   canvas3->SaveAs("1leadbtagmjcondition/tight_match.eps");
+  canvas3->Write();
 
   canvas4->cd();
 
@@ -291,6 +335,7 @@ void PartonMatch(){
   gPad->Update();
 
   canvas4->SaveAs("1leadbtagmjcondition/sig_match.eps");
+  canvas4->Write();
 
   canvas5->cd();
 
@@ -311,6 +356,9 @@ void PartonMatch(){
   gPad->Update();
 
   canvas5->SaveAs("1leadbtagmjcondition/bkg_match.eps");
+  canvas5->Write();
+
+  fhistos->Close();
 
 }
 
