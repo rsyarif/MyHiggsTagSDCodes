@@ -206,19 +206,19 @@ void PartonMatch_loose(){
   //loose match
   postfix = "loose_FjPt_noGenPtCut";
   var = "FatJetInfo_Jet_pt";
-  //TH2D* h2D_fj_bkg = PartonMatch(dir.c_str(),fbkg.c_str(),var.c_str(),6,dR_loose,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
-  //TH1D* h_fj_bkg = PartonMatch_ProjectY(h2D_fj_bkg,dir.c_str(),fbkg.c_str(),var.c_str(),save,postfix);
+  //TH2D* h2D_fj_bkg = PartonMatch(dir,fbkg,var,6,dR_loose,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
+  //TH1D* h_fj_bkg = PartonMatch_ProjectY(h2D_fj_bkg,dir,fbkg,var,save,postfix);
 
-  TH2D* h2D_fj_sig = PartonMatch(dir.c_str(),fsig.c_str(),var.c_str(),25,dR_loose,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
-  TH1D* h_fj_sig = PartonMatch_ProjectY(h2D_fj_sig,dir.c_str(),fsig.c_str(),var.c_str(),save,postfix);
+  TH2D* h2D_fj_sig = PartonMatch(dir,fsig,var,25,dR_loose,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
+  TH1D* h_fj_sig = PartonMatch_ProjectY(h2D_fj_sig,dir,fsig,var,save,postfix);
 
   postfix = "loose_GenPt_noGenPtCut";
   var = "GenPruned_pT";
-  //TH2D* h2D_gen_bkg = PartonMatch(dir.c_str(),fbkg.c_str(),var.c_str(),6,dR_loose,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
-  //TH1D* h_gen_bkg = PartonMatch_ProjectY(h2D_gen_bkg,dir.c_str(),fbkg.c_str(),var.c_str(),save,postfix);
+  //TH2D* h2D_gen_bkg = PartonMatch(dir,fbkg,var,6,dR_loose,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
+  //TH1D* h_gen_bkg = PartonMatch_ProjectY(h2D_gen_bkg,dir,fbkg,var,save,postfix);
 
-  TH2D* h2D_gen_sig = PartonMatch(dir.c_str(),fsig.c_str(),var.c_str(),25,dR_loose,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
-  TH1D* h_gen_sig = PartonMatch_ProjectY(h2D_gen_sig,dir.c_str(),fsig.c_str(),var.c_str(),save,postfix);
+  TH2D* h2D_gen_sig = PartonMatch(dir,fsig,var,25,dR_loose,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
+  TH1D* h_gen_sig = PartonMatch_ProjectY(h2D_gen_sig,dir,fsig,var,save,postfix);
 
   TCanvas* canvas = new TCanvas("Matching","Matching",800,600);
   //TCanvas* canvas2 = new TCanvas("After matching","After matching",800,600);
@@ -297,19 +297,19 @@ void PartonMatch_med(){
   //med match
   postfix = "med_FjPt_noGenPtCut";
   var = "FatJetInfo_Jet_pt";
-  //TH2D* h2D_fj_bkg = PartonMatch(dir.c_str(),fbkg.c_str(),var.c_str(),6,dR_med,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
-  //TH1D* h_fj_bkg = PartonMatch_ProjectY(h2D_fj_bkg,dir.c_str(),fbkg.c_str(),var.c_str(),save,postfix);
+  //TH2D* h2D_fj_bkg = PartonMatch(dir,fbkg,var,6,dR_med,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
+  //TH1D* h_fj_bkg = PartonMatch_ProjectY(h2D_fj_bkg,dir,fbkg,var,save,postfix);
 
-  TH2D* h2D_fj_sig = PartonMatch(dir.c_str(),fsig.c_str(),var.c_str(),25,dR_med,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
-  TH1D* h_fj_sig = PartonMatch_ProjectY(h2D_fj_sig,dir.c_str(),fsig.c_str(),var.c_str(),save,postfix);
+  TH2D* h2D_fj_sig = PartonMatch(dir,fsig,var,25,dR_med,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
+  TH1D* h_fj_sig = PartonMatch_ProjectY(h2D_fj_sig,dir,fsig,var,save,postfix);
 
   postfix = "med_GenPt_noGenPtCut";
   var = "GenPruned_pT";
-  //TH2D* h2D_gen_bkg = PartonMatch(dir.c_str(),fbkg.c_str(),var.c_str(),6,dR_med,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
-  //TH1D* h_gen_bkg = PartonMatch_ProjectY(h2D_gen_bkg,dir.c_str(),fbkg.c_str(),var.c_str(),save,postfix);
+  //TH2D* h2D_gen_bkg = PartonMatch(dir,fbkg,var,6,dR_med,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
+  //TH1D* h_gen_bkg = PartonMatch_ProjectY(h2D_gen_bkg,dir,fbkg,var,save,postfix);
 
-  TH2D* h2D_gen_sig = PartonMatch(dir.c_str(),fsig.c_str(),var.c_str(),25,dR_med,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
-  TH1D* h_gen_sig = PartonMatch_ProjectY(h2D_gen_sig,dir.c_str(),fsig.c_str(),var.c_str(),save,postfix);
+  TH2D* h2D_gen_sig = PartonMatch(dir,fsig,var,25,dR_med,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
+  TH1D* h_gen_sig = PartonMatch_ProjectY(h2D_gen_sig,dir,fsig,var,save,postfix);
 
   TCanvas* canvas = new TCanvas("Matching","Matching",800,600);
   //TCanvas* canvas2 = new TCanvas("After matching","After matching",800,600);
@@ -388,19 +388,19 @@ void PartonMatch_tight(){
   //tight match
   postfix = "tight_FjPt_noGenPtCut";
   var = "FatJetInfo_Jet_pt";
-  //TH2D* h2D_fj_bkg = PartonMatch(dir.c_str(),fbkg.c_str(),var.c_str(),6,dR_tight,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
-  //TH1D* h_fj_bkg = PartonMatch_ProjectY(h2D_fj_bkg,dir.c_str(),fbkg.c_str(),var.c_str(),save,postfix);
+  //TH2D* h2D_fj_bkg = PartonMatch(dir,fbkg,var,6,dR_tight,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
+  //TH1D* h_fj_bkg = PartonMatch_ProjectY(h2D_fj_bkg,dir,fbkg,var,save,postfix);
 
-  TH2D* h2D_fj_sig = PartonMatch(dir.c_str(),fsig.c_str(),var.c_str(),25,dR_tight,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
-  TH1D* h_fj_sig = PartonMatch_ProjectY(h2D_fj_sig,dir.c_str(),fsig.c_str(),var.c_str(),save,postfix);
+  TH2D* h2D_fj_sig = PartonMatch(dir,fsig,var,25,dR_tight,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
+  TH1D* h_fj_sig = PartonMatch_ProjectY(h2D_fj_sig,dir,fsig,var,save,postfix);
 
   postfix = "tight_GenPt_noGenPtCut";
   var = "GenPruned_pT";
-  //TH2D* h2D_gen_bkg = PartonMatch(dir.c_str(),fbkg.c_str(),var.c_str(),6,dR_tight,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
-  //TH1D* h_gen_bkg = PartonMatch_ProjectY(h2D_gen_bkg,dir.c_str(),fbkg.c_str(),var.c_str(),save,postfix);
+  //TH2D* h2D_gen_bkg = PartonMatch(dir,fbkg,var,6,dR_tight,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
+  //TH1D* h_gen_bkg = PartonMatch_ProjectY(h2D_gen_bkg,dir,fbkg,var,save,postfix);
 
-  TH2D* h2D_gen_sig = PartonMatch(dir.c_str(),fsig.c_str(),var.c_str(),25,dR_tight,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
-  TH1D* h_gen_sig = PartonMatch_ProjectY(h2D_gen_sig,dir.c_str(),fsig.c_str(),var.c_str(),save,postfix);
+  TH2D* h2D_gen_sig = PartonMatch(dir,fsig,var,25,dR_tight,xbin,xmin,xmax,ybin,ymin,ymax,display,save,postfix);
+  TH1D* h_gen_sig = PartonMatch_ProjectY(h2D_gen_sig,dir,fsig,var,save,postfix);
 
   TCanvas* canvas = new TCanvas("Matching","Matching",800,600);
   //TCanvas* canvas2 = new TCanvas("After matching","After matching",800,600);
