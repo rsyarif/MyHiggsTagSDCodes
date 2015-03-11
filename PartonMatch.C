@@ -240,32 +240,32 @@ void makeHistos(){
   //loose match
   postfix = "dRmax12";
   TFile *f_sig_l = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH2D* h2_sig_l = PartonMatch_2D(f_sig_l,var,xbin,xmin,xmax,ybin,ymin,ymax,"dRmax12");
-  TH1D* h_sig_l = PartonMatch_1D(f_sig_l,"log(Fj_chi)",50,-22,-2,"dRmax12");
+  TH2D* h2_sig_l = PartonMatch_2D(f_sig_l,var,xbin,xmin,xmax,ybin,ymin,1.2,"dRmax12");
+  TH1D* h_sig_l = PartonMatch_1D(f_sig_l,"log(Fj_chi)",xbin,xmin,xmax,"dRmax12");
 
   TFile *f_bkg_l = new TFile((dir+"/"+"fMatch_"+fbkg+"_"+postfix+".root").c_str());
-  TH2D* h2_bkg_l = PartonMatch_2D(f_bkg_l,var,xbin,xmin,xmax,ybin,ymin,ymax,"dRmax12");
-  TH1D* h_bkg_l = PartonMatch_1D(f_bkg_l,"log(Fj_chi)",50,-22,-2,"dRmax12");
+  TH2D* h2_bkg_l = PartonMatch_2D(f_bkg_l,var,xbin,xmin,xmax,ybin,ymin,1.2,"dRmax12");
+  TH1D* h_bkg_l = PartonMatch_1D(f_bkg_l,"log(Fj_chi)",xbin,xmin,xmax,"dRmax12");
 
   //med match
   postfix = "dRmax02";
   TFile *f_sig_m = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH2D* h2_sig_m = PartonMatch_2D(f_sig_m,var,xbin,xmin,xmax,ybin,ymin,ymax,"dRmax02");
-  TH1D* h_sig_m = PartonMatch_1D(f_sig_m,"log(Fj_chi)",50,-22,-2,"dRmax02");
+  TH2D* h2_sig_m = PartonMatch_2D(f_sig_m,var,xbin,xmin,xmax,ybin,ymin,0.2,"dRmax02");
+  TH1D* h_sig_m = PartonMatch_1D(f_sig_m,"log(Fj_chi)",xbin,xmin,xmax,"dRmax02");
 
   TFile *f_bkg_m = new TFile((dir+"/"+"fMatch_"+fbkg+"_"+postfix+".root").c_str());
-  TH2D* h2_bkg_m = PartonMatch_2D(f_bkg_m,var,xbin,xmin,xmax,ybin,ymin,ymax,"dRmax02");
-  TH1D* h_bkg_m = PartonMatch_1D(f_bkg_m,"log(Fj_chi)",50,-22,-2,"dRmax02");
+  TH2D* h2_bkg_m = PartonMatch_2D(f_bkg_m,var,xbin,xmin,xmax,ybin,ymin,0.2,"dRmax02");
+  TH1D* h_bkg_m = PartonMatch_1D(f_bkg_m,"log(Fj_chi)",xbin,xmin,xmax,"dRmax02");
 
   //tight match
   postfix = "dRmax005";
   TFile *f_sig_t = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH2D* h2_sig_t = PartonMatch_2D(f_sig_t,var,xbin,xmin,xmax,ybin,ymin,ymax,"dRmax005");
-  TH1D* h_sig_t = PartonMatch_1D(f_sig_t,"log(Fj_chi)",50,-22,-2,"dRmax005");
+  TH2D* h2_sig_t = PartonMatch_2D(f_sig_t,var,xbin,xmin,xmax,ybin,ymin,0.05,"dRmax005");
+  TH1D* h_sig_t = PartonMatch_1D(f_sig_t,"log(Fj_chi)",xbin,xmin,xmax,"dRmax005");
 
   TFile *f_bkg_t = new TFile((dir+"/"+"fMatch_"+fbkg+"_"+postfix+".root").c_str());
-  TH2D* h2_bkg_t = PartonMatch_2D(f_bkg_t,var,xbin,xmin,xmax,ybin,ymin,ymax,"dRmax005");
-  TH1D* h_bkg_t = PartonMatch_1D(f_bkg_t,"log(Fj_chi)",50,-22,-2,"dRmax005");
+  TH2D* h2_bkg_t = PartonMatch_2D(f_bkg_t,var,xbin,xmin,xmax,ybin,ymin,0.05,"dRmax005");
+  TH1D* h_bkg_t = PartonMatch_1D(f_bkg_t,"log(Fj_chi)",xbin,xmin,xmax,"dRmax005");
 
 
   TCanvas* canvas = new TCanvas("loose matching","loose matching",800,600);
@@ -305,15 +305,16 @@ void makeHistos(){
   h_bkg_m->Write("h_bkg_m");
   h_bkg_t->Write("h_bkg_t");
 
+
+  Double_t norm1;
+  Double_t norm2;
+
   canvas->cd();
 
   h_sig_l->SetStats(0);
   h_bkg_l->SetStats(0);
   h_sig_l->SetLineColor(kBlue);
   h_bkg_l->SetLineColor(kRed);
-
-  Double_t norm1;
-  Double_t norm2;
 
   norm1 = h_sig_l->GetEntries();
   h_sig_l->Scale(1/norm1);
@@ -322,6 +323,13 @@ void makeHistos(){
 
   h_sig_l->Draw();
   h_bkg_l->Draw("SAME");
+
+  leg = new TLegend(0.75,0.65,0.95,0.85);
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+  leg->AddEntry(h_sig_l,"Radion","L");
+  leg->AddEntry(h_bkg_l,"ttjets","L");
+  leg->Draw("SAME");
 
   gPad->Update();
 
@@ -342,6 +350,13 @@ void makeHistos(){
 
   h_sig_m->Draw();
   h_bkg_m->Draw("SAME");
+
+  leg2 = new TLegend(0.75,0.65,0.95,0.85);
+  leg2->SetFillStyle(0);
+  leg2->SetBorderSize(0);
+  leg2->AddEntry(h_sig_m,"Radion","L");
+  leg2->AddEntry(h_bkg_m,"ttjets","L");
+  leg2->Draw("SAME");
 
   gPad->Update();
 
@@ -365,6 +380,13 @@ void makeHistos(){
 
   gPad->Update();
 
+  leg3 = new TLegend(0.75,0.65,0.95,0.85);
+  leg3->SetFillStyle(0);
+  leg3->SetBorderSize(0);
+  leg3->AddEntry(h_sig_t,"Radion","L");
+  leg3->AddEntry(h_bkg_t,"ttjets","L");
+  leg3->Draw("SAME");
+
   canvas3->SaveAs("1leadbtagmjcondition/tight_match.eps");
   canvas3->Write();
 
@@ -383,6 +405,14 @@ void makeHistos(){
   h_sig_t->Draw();
   h_sig_m->Draw("SAME");
   h_sig_l->Draw("SAME");
+
+  leg4 = new TLegend(0.75,0.65,0.95,0.85);
+  leg4->SetFillStyle(0);
+  leg4->SetBorderSize(0);
+  leg4->AddEntry(h_sig_l,"loose","L");
+  leg4->AddEntry(h_sig_m,"medium","L");
+  leg4->AddEntry(h_sig_t,"tight","L");
+  leg4->Draw("SAME");
 
   gPad->Update();
 
@@ -404,6 +434,14 @@ void makeHistos(){
   h_bkg_l->Draw();
   h_bkg_m->Draw("SAME");
   h_bkg_t->Draw("SAME");
+
+  leg5 = new TLegend(0.75,0.65,0.95,0.85);
+  leg5->SetFillStyle(0);
+  leg5->SetBorderSize(0);
+  leg5->AddEntry(h_bkg_l,"loose","L");
+  leg5->AddEntry(h_bkg_m,"medium","L");
+  leg5->AddEntry(h_bkg_t,"tight","L");
+  leg5->Draw("SAME");
 
   gPad->Update();
 
