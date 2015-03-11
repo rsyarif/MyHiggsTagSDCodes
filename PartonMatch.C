@@ -305,10 +305,6 @@ void makeHistos(){
   h_bkg_m->Write("h_bkg_m");
   h_bkg_t->Write("h_bkg_t");
 
-
-  Double_t norm1;
-  Double_t norm2;
-
   canvas->cd();
 
   h_sig_l->SetStats(0);
@@ -316,13 +312,8 @@ void makeHistos(){
   h_sig_l->SetLineColor(kBlue);
   h_bkg_l->SetLineColor(kRed);
 
-  norm1 = h_sig_l->GetEntries();
-  h_sig_l->Scale(1/norm1);
-  norm2 = h_bkg_l->GetEntries();
-  h_bkg_l->Scale(1/norm2);
-
-  h_sig_l->Draw();
-  h_bkg_l->Draw("SAME");
+  h_sig_l->DrawNormalized();
+  h_bkg_l->DrawNormalized("SAME");
 
   leg = new TLegend(0.75,0.65,0.95,0.85);
   leg->SetFillStyle(0);
@@ -343,13 +334,8 @@ void makeHistos(){
   h_sig_m->SetLineColor(kBlue);
   h_bkg_m->SetLineColor(kRed);
 
-  norm1 = h_sig_m->GetEntries();
-  h_sig_m->Scale(1/norm1);
-  norm2 = h_bkg_m->GetEntries();
-  h_bkg_m->Scale(1/norm2);
-
-  h_sig_m->Draw();
-  h_bkg_m->Draw("SAME");
+  h_sig_m->DrawNormalized();
+  h_bkg_m->DrawNormalized("SAME");
 
   leg2 = new TLegend(0.75,0.65,0.95,0.85);
   leg2->SetFillStyle(0);
@@ -370,13 +356,8 @@ void makeHistos(){
   h_sig_t->SetLineColor(kBlue);
   h_bkg_t->SetLineColor(kRed);
 
-  norm1 = h_sig_t->GetEntries();
-  h_sig_t->Scale(1/norm1);
-  norm2 = h_bkg_t->GetEntries();
-  h_bkg_t->Scale(1/norm2);
-
-  h_sig_t->Draw();
-  h_bkg_t->Draw("SAME");
+  h_sig_t->DrawNormalized();
+  h_bkg_t->DrawNormalized("SAME");
 
   gPad->Update();
 
@@ -402,9 +383,9 @@ void makeHistos(){
   h_sig_m->SetLineColor(kYellow+2);
   h_sig_t->SetLineColor(kGreen+2);
 
-  h_sig_t->Draw();
-  h_sig_m->Draw("SAME");
-  h_sig_l->Draw("SAME");
+  h_sig_t->DrawNormalized();
+  h_sig_m->DrawNormalized("SAME");
+  h_sig_l->DrawNormalized("SAME");
 
   leg4 = new TLegend(0.75,0.65,0.95,0.85);
   leg4->SetFillStyle(0);
@@ -431,9 +412,9 @@ void makeHistos(){
   h_bkg_m->SetLineColor(kYellow+2);
   h_bkg_t->SetLineColor(kGreen+2);
 
-  h_bkg_l->Draw();
-  h_bkg_m->Draw("SAME");
-  h_bkg_t->Draw("SAME");
+  h_bkg_l->DrawNormalized();
+  h_bkg_m->DrawNormalized("SAME");
+  h_bkg_t->DrawNormalized("SAME");
 
   leg5 = new TLegend(0.75,0.65,0.95,0.85);
   leg5->SetFillStyle(0);
