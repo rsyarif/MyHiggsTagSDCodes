@@ -1,9 +1,13 @@
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <TFile.h>
 #include <TH1D.h>
 #include <TGraph.h>
 #include <TCanvas.h>
 #include <TMultiGraph.h>
+#include <TLatex.h>
+#include <TMarker.h>
 
 using namespace std;
 
@@ -21,9 +25,6 @@ void Plot_efficiency(){
   TH1D *h_sig_t = (TH1D*)f->Get("h_sig_t");
   TH1D *h_bkg_t = (TH1D*)f->Get("h_bkg_t");
 
-  double x_l[sig_l_nbins]; double xmin = -18.; double xmax = -2.;
-  double increment = (xmax-xmin)/sig_l_nbins;
-
   int sig_l_nbins = h_sig_l->GetSize()-2;
   int bkg_l_nbins = h_bkg_l->GetSize()-2;
   double Ssig_l = h_sig_l->Integral(0,sig_l_nbins+1);
@@ -32,14 +33,18 @@ void Plot_efficiency(){
   double bkg_l_integral[bkg_l_nbins];
   double sig_l_eff[sig_l_nbins];
   double bkg_l_eff[bkg_l_nbins];
+  double x_l[sig_l_nbins]; double xmin = -18.; double xmax = -2.;
+  double increment = (xmax-xmin)/sig_l_nbins;
+  cout <<"---loose---"<<endl;
   for(int i=0;i<sig_l_nbins;i++){
     sig_l_integral[i]=h_sig_l->Integral(i+1,sig_l_nbins+1);
     bkg_l_integral[i]=h_bkg_l->Integral(i+1,bkg_l_nbins+1);
     sig_l_eff[i] = sig_l_integral[i]/Ssig_l;
     bkg_l_eff[i] = bkg_l_integral[i]/Sbkg_l;
     x_l[i] = xmin + increment*i;
-    //cout<<i+1<<". x = "<<x_l[i]<< ", sig_l =  "<< sig_l_integral[i]/Ssig_l<< ", bkg_l = "<< bkg_l_integral[i]/Sbkg_l << endl;
+    cout<<i+1<<". x = "<<x_l[i]<< ", sig_l =  "<< sig_l_integral[i]/Ssig_l<< ", bkg_l = "<< bkg_l_integral[i]/Sbkg_l << endl;
   }
+  cout << endl;
 
   int sig_m_nbins = h_sig_m->GetSize()-2;
   int bkg_m_nbins = h_bkg_m->GetSize()-2;
@@ -50,15 +55,17 @@ void Plot_efficiency(){
   double sig_m_eff[sig_m_nbins];
   double bkg_m_eff[bkg_m_nbins];
   double x_m[sig_m_nbins]; //double xmin = -18.; double xmax = -2.;
-  increment = (xmax-xmin)/sig_m_nbins;
+  double increment_m = (xmax-xmin)/sig_m_nbins;
+  cout << "---medium---"<<endl;
   for(int i=0;i<sig_m_nbins;i++){
     sig_m_integral[i]=h_sig_m->Integral(i+1,sig_m_nbins+1);
     bkg_m_integral[i]=h_bkg_m->Integral(i+1,bkg_m_nbins+1);
     sig_m_eff[i] = sig_m_integral[i]/Ssig_m;
     bkg_m_eff[i] = bkg_m_integral[i]/Sbkg_m;
-    x_m[i] = xmin + increment*i;
-    //cout<<i+1<<". x = "<<x_m[i]<< ", sig_m =  "<< sig_m_integral[i]/Ssig_m<< ", bkg_m = "<< bkg_m_integral[i]/Sbkg_m << endl;
+    x_m[i] = xmin + increment_m*i;
+    cout<<i+1<<". x = "<<x_m[i]<< ", sig_m =  "<< sig_m_integral[i]/Ssig_m<< ", bkg_m = "<< bkg_m_integral[i]/Sbkg_m << endl;
   }
+  cout << endl;
 
   int sig_t_nbins = h_sig_t->GetSize()-2;
   int bkg_t_nbins = h_bkg_t->GetSize()-2;
@@ -69,15 +76,19 @@ void Plot_efficiency(){
   double sig_t_eff[sig_t_nbins];
   double bkg_t_eff[bkg_t_nbins];
   double x_t[sig_t_nbins]; //double xmin = -18.; double xmax = -2.;
-  increment = (xmax-xmin)/sig_t_nbins;
+  double increment_t = (xmax-xmin)/sig_t_nbins;
+  cout<<"---tight---"<<endl;
   for(int i=0;i<sig_t_nbins;i++){
     sig_t_integral[i]=h_sig_t->Integral(i+1,sig_t_nbins+1);
     bkg_t_integral[i]=h_bkg_t->Integral(i+1,bkg_t_nbins+1);
     sig_t_eff[i] = sig_t_integral[i]/Ssig_t;
     bkg_t_eff[i] = bkg_t_integral[i]/Sbkg_t;
-    x_t[i] = xmin + increment*i;
-    //cout<<i+1<<". x = "<<x_t[i]<< ", sig_t =  "<< sig_t_integral[i]/Ssig_t<< ", bkg_t = "<< bkg_t_integral[i]/Sbkg_t << endl;
+    x_t[i] = xmin + increment_t*i;
+    cout<<i+1<<". x = "<<x_t[i]<< ", sig_t =  "<< sig_t_integral[i]/Ssig_t<< ", bkg_t = "<< bkg_t_integral[i]/Sbkg_t << endl;
   }
+  cout << endl;
+
+  //------------loose-------------------------
 
   TCanvas *c3 = new TCanvas("c3","c3",800, 600);
 
@@ -113,6 +124,8 @@ void Plot_efficiency(){
 
   c3->SaveAs((dir+"/"+"efficiency_loose.eps").c_str());
 
+  //----------------medium----------------------
+
   TCanvas *c3_m = new TCanvas("c3_m","c3_m",800, 600);
 
   TMultiGraph *mg_m = new TMultiGraph("mg_m","mg_m");
@@ -146,6 +159,8 @@ void Plot_efficiency(){
   c3_m->BuildLegend();
 
   c3_m->SaveAs((dir+"/"+"efficiency_med.eps").c_str());
+
+  //---------------tight------------------------
 
   TCanvas *c3_t = new TCanvas("c3_t","c3_t",800, 600);
 
@@ -181,43 +196,51 @@ void Plot_efficiency(){
 
   c3_t->SaveAs((dir+"/"+"efficiency_tight.eps").c_str());
 
+  //------------ROC-------------------------
+
   TCanvas *c = new TCanvas("c","c",800,600);
   c->cd();
 
-  TMultiGraph *mg_ROC = new TMultiGraph("mg_ROC","mg_ROC");
+  TMultiGraph *mg_ROC = new TMultiGraph("ROC","ROC");
 
   double bkg_l_rej[bkg_l_nbins];
   for(int i =0;i<bkg_l_nbins;i++)bkg_l_rej[i]=1-bkg_l_eff[i];
 
   TGraph *gr3 = new TGraph(sig_l_nbins,sig_l_eff,bkg_l_rej);
+  gr3->SetTitle("loose");
   gr3->SetLineColor(kRed);
   gr3->SetLineWidth(2);
   gr3->GetXaxis()->SetTitle("Eff_{sig}");
   gr3->GetYaxis()->SetTitle("1-Eff_{bkg}");
   gr3->GetXaxis()->SetRangeUser(0,1);
   gr3->GetYaxis()->SetRangeUser(0,1);
+  gr3->SetFillStyle(0);
 
   double bkg_m_rej[bkg_m_nbins];
   for(int i =0;i<bkg_m_nbins;i++)bkg_m_rej[i]=1-bkg_m_eff[i];
 
   TGraph *gr3_m = new TGraph(sig_m_nbins,sig_m_eff,bkg_m_rej);
+  gr3_m->SetTitle("medium");
   gr3_m->SetLineColor(kGreen+2);
   gr3_m->SetLineWidth(2);
   gr3_m->GetXaxis()->SetTitle("Eff_{sig}");
   gr3_m->GetYaxis()->SetTitle("1-Eff_{bkg}");
   gr3_m->GetXaxis()->SetRangeUser(0,1);
   gr3_m->GetYaxis()->SetRangeUser(0,1);
+  gr3_m->SetFillStyle(0);
 
   double bkg_t_rej[bkg_t_nbins];
   for(int i =0;i<bkg_t_nbins;i++)bkg_t_rej[i]=1-bkg_t_eff[i];
 
   TGraph *gr3_t = new TGraph(sig_t_nbins,sig_t_eff,bkg_t_rej);
+  gr3_t->SetTitle("tight");
   gr3_t->SetLineColor(kBlue);
   gr3_t->SetLineWidth(2);
   gr3_t->GetXaxis()->SetTitle("Eff_{sig}");
   gr3_t->GetYaxis()->SetTitle("1-Eff_{bkg}");
   gr3_t->GetXaxis()->SetRangeUser(0,1);
   gr3_t->GetYaxis()->SetRangeUser(0,1);
+  gr3_t->SetFillStyle(0);
 
   mg_ROC->Add(gr3);
   mg_ROC->Add(gr3_m);
@@ -229,15 +252,44 @@ void Plot_efficiency(){
   mg_ROC->GetXaxis()->SetRangeUser(0,1);
   mg_ROC->GetYaxis()->SetRangeUser(0,1);
   mg_ROC->SetTitle("ROC Curves");
-  //c3_ROC->BuildLegend();
 
-  leg = new TLegend(0.7,0.65,0.9,0.85);
-  leg->SetFillStyle(0);
-  leg->SetBorderSize(0);
-  leg->AddEntry(gr3,"dR<1.2","L");
-  leg->AddEntry(gr3_m,"dR<0.2","L");
-  leg->AddEntry(gr3_t,"dR<0.05","L");
-  leg->Draw("SAME");
+
+  c->BuildLegend(0.2,0.2,0.2+0.2,0.2+0.15);
+
+  //-----putting marker on graph-----
+
+  int pt_i = 18; //(10,17,25)
+  double pt = xmin+increment*pt_i;
+  ostringstream ostr;
+  ostr << pt;
+  string pt_s = ostr.str();
+
+  TLatex *latex = new TLatex(gr3->GetX()[pt_i], gr3->GetY()[pt_i],pt_s.c_str());
+  gr3->GetListOfFunctions()->Add(latex);
+  latex->SetTextSize(0.02);
+  TMarker* marker = new TMarker;
+  marker->SetMarkerStyle(24);
+  marker->SetMarkerSize(0.5);
+  marker->DrawMarker(gr3->GetX()[pt_i], gr3->GetY()[pt_i]);
+  marker->Draw("SAME");
+
+  TLatex *latex_m = new TLatex(gr3_m->GetX()[pt_i], gr3_m->GetY()[pt_i],pt_s.c_str());
+  gr3_m->GetListOfFunctions()->Add(latex_m);
+  latex_m->SetTextSize(0.02);
+  TMarker* marker_m = new TMarker;
+  marker_m->SetMarkerStyle(25);
+  marker_m->SetMarkerSize(0.5);
+  marker_m->DrawMarker(gr3_m->GetX()[pt_i], gr3_m->GetY()[pt_i]);
+  marker_m->Draw("SAME");
+
+  TLatex *latex_t = new TLatex(gr3_t->GetX()[pt_i], gr3_t->GetY()[pt_i],pt_s.c_str());
+  gr3_t->GetListOfFunctions()->Add(latex_t);
+  latex_t->SetTextSize(0.02);
+  TMarker* marker_t = new TMarker;
+  marker_t->SetMarkerStyle(26);
+  marker_t->SetMarkerSize(0.5);
+  marker_t->DrawMarker(gr3_t->GetX()[pt_i], gr3_t->GetY()[pt_i]);
+  marker_t->Draw("SAME");
 
   c->SaveAs((dir+"/"+"ROC.eps").c_str());
 
