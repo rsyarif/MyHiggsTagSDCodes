@@ -11,9 +11,16 @@
 
 using namespace std;
 
-string dir = "1leadbtagmjcondition";
+//string dir = "1leadbtagmjcondition";
+//string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
 
-void Plot_efficiency(){
+void Plot_efficiency(std::string dir = ""){
+
+  if(dir==""){
+    std::cout<< "Choose Directory!"<< endl;
+    return;
+  }
+
   TFile *f = new TFile((dir+"/"+"PartonMatch_histos.root").c_str());
 
   TH1D *h_sig_l = (TH1D*)f->Get("h_sig_l");
@@ -24,6 +31,18 @@ void Plot_efficiency(){
 
   TH1D *h_sig_t = (TH1D*)f->Get("h_sig_t");
   TH1D *h_bkg_t = (TH1D*)f->Get("h_bkg_t");
+
+
+  //float Ssig = 4688;
+  //float Sbkg = 1337;
+  //float Ssig_l = Ssig;
+  //float Sbkg_l = Sbkg;
+  //float Ssig_m = Ssig;
+  //float Sbkg_m = Sbkg;
+  //float Ssig_t = Ssig;
+  //float Sbkg_t = Sbkg;
+
+  //---------Calculating efficiciencies----------
 
   int sig_l_nbins = h_sig_l->GetSize()-2;
   int bkg_l_nbins = h_bkg_l->GetSize()-2;
@@ -119,8 +138,9 @@ void Plot_efficiency(){
 
   mg->Draw("APL");
   mg->GetXaxis()->SetTitle("log(#chi) >");
+  mg->GetYaxis()->SetTitle("Efficiency");
   mg->SetTitle("after loose matching");
-  c3->BuildLegend();
+  c3->BuildLegend(0.7,.75,.9,.9);
 
   c3->SaveAs((dir+"/"+"efficiency_loose.eps").c_str());
 
@@ -155,8 +175,9 @@ void Plot_efficiency(){
 
   mg_m->Draw("APL");
   mg_m->GetXaxis()->SetTitle("log(#chi) >");
+  mg_m->GetYaxis()->SetTitle("Efficiency");
   mg_m->SetTitle("after loose matching");
-  c3_m->BuildLegend();
+  c3_m->BuildLegend(0.7,.75,.9,.9);
 
   c3_m->SaveAs((dir+"/"+"efficiency_med.eps").c_str());
 
@@ -191,10 +212,91 @@ void Plot_efficiency(){
 
   mg_t->Draw("APL");
   mg_t->GetXaxis()->SetTitle("log(#chi) >");
+  mg_t->GetYaxis()->SetTitle("Efficiency");
   mg_t->SetTitle("after loose matching");
-  c3_t->BuildLegend();
+  c3_t->BuildLegend(0.7,.75,.9,.9);
 
   c3_t->SaveAs((dir+"/"+"efficiency_tight.eps").c_str());
+
+  //---------superimpose signal efficiency graph------
+
+  TCanvas *c_sig = new TCanvas("c_sig","c_sig",800,600);
+  c_sig->cd();
+
+  TMultiGraph *mg_sig = new TMultiGraph("sig","sig");
+
+  mg_sig->Add(gr1);
+  mg_sig->Add(gr1_m);
+  mg_sig->Add(gr1_t);
+
+  gr1->SetLineStyle(4);
+  gr1_m->SetLineStyle(9);
+  gr1->SetMarkerStyle(7);
+  gr1_m->SetMarkerStyle(7);
+  gr1_t->SetMarkerStyle(7);
+
+  mg_sig->Draw("APL");
+  mg_sig->GetXaxis()->SetTitle("log(#chi) >");
+  mg_sig->GetYaxis()->SetTitle("Efficiency");
+  mg_sig->SetTitle("after loose matching");
+  //c_sig->BuildLegend(0.7,.75,.9,.9);
+
+  c_sig->SaveAs((dir+"/"+"efficiency_sig.eps").c_str());
+
+  //---------superimpose bkg efficiency graph------
+
+  TCanvas *c_bkg = new TCanvas("c_bkg","c_bkg",800,600);
+  c_bkg->cd();
+
+  TMultiGraph *mg_bkg = new TMultiGraph("bkg","bkg");
+
+  mg_bkg->Add(gr2);
+  mg_bkg->Add(gr2_m);
+  mg_bkg->Add(gr2_t);
+
+  gr2->SetLineStyle(4);
+  gr2_m->SetLineStyle(9);
+  gr2->SetMarkerStyle(7);
+  gr2_m->SetMarkerStyle(7);
+  gr2_t->SetMarkerStyle(7);
+
+  mg_bkg->Draw("APL");
+  mg_bkg->GetXaxis()->SetTitle("log(#chi) >");
+  mg_bkg->GetYaxis()->SetTitle("Efficiency");
+  mg_bkg->SetTitle("after loose matching");
+  //c_bkg->BuildLegend(0.7,.75,.9,.9);
+
+  c_bkg->SaveAs((dir+"/"+"efficiency_bkg.eps").c_str());
+
+  //---------superimpose sig&bkg efficiency graph------
+
+  TCanvas *c_sb = new TCanvas("c_sb","c_sb",800,600);
+  c_sb->cd();
+
+  TMultiGraph *mg_sb = new TMultiGraph("sb","sb");
+
+
+  gr1->SetTitle("HH - dR<1.2");
+  gr1_m->SetTitle("HH - dR<0.2");
+  gr1_t->SetTitle("HH - dR<0.05");
+  gr2->SetTitle("tt - dR<1.2");
+  gr2_m->SetTitle("tt - dR<0.2");
+  gr2_t->SetTitle("tt - dR<0.05");
+
+  mg_sb->Add(gr1);
+  mg_sb->Add(gr1_m);
+  mg_sb->Add(gr1_t);
+  mg_sb->Add(gr2);
+  mg_sb->Add(gr2_m);
+  mg_sb->Add(gr2_t);
+
+  mg_sb->Draw("APL");
+  mg_sb->GetXaxis()->SetTitle("log(#chi) >");
+  mg_sb->GetYaxis()->SetTitle("Efficiency");
+  mg_sb->SetTitle("after loose matching");
+  c_sb->BuildLegend(0.7,.65,.9,.9);
+
+  c_sb->SaveAs((dir+"/"+"efficiency_sb.eps").c_str());
 
   //------------ROC-------------------------
 
