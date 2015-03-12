@@ -13,8 +13,9 @@ void CountFatJets(std::string fname, std::string dir = "btaganaSubJets"){
   int nChi = t->Draw("FatJetInfo.Jet_SD_chi","");
   int nChi_valid = t->Draw("FatJetInfo.Jet_SD_chi","FatJetInfo.Jet_SD_chi>0");
   int nChi_invalid = t->Draw("FatJetInfo.Jet_SD_chi","FatJetInfo.Jet_SD_chi<=0");
+  int nChi_invalid0 = t->Draw("FatJetInfo.Jet_SD_chi","FatJetInfo.Jet_SD_chi==-0");
 
-  cout<< "Number of calculated chi's = "<< nChi << "(valid = "<<nChi_valid<<", invalid = "<< nChi_invalid <<" )"<<endl;
+  cout<< "Number of calculated chi's = "<< nChi << "(valid = "<<nChi_valid<<", invalid = "<< nChi_invalid <<", invalid(-0) = "<< nChi_invalid0 <<" )"<<endl;
   delete t;
 }
 
