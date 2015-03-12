@@ -36,18 +36,18 @@ void Plot_General_sig_bkg(bool save = false){
 
   std::string rdir = "btaganaSubJets";
 
-  std::string var = "log(FatJetInfo.Jet_SD_chi)";
-  //std::string var = "FatJetInfo.Jet_pt";
+  //std::string var = "log(FatJetInfo.Jet_SD_chi)";
+  std::string var = "FatJetInfo.Jet_pt";
 
   //std::string cut = "FatJetInfo.nJet>0";
-  std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_pt>200";
-  //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0";
+  //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_pt>200";
+  std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0";
   //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_pt>200";
   //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_pt>200&&FatJetInfo.Jet_SD_nBtagMicrojets>1";
   //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_SD_isLeadMicrojetBtag>0&&FatJetInfo.Jet_pt>200&&FatJetInfo.Jet_SD_nBtagMicrojets>1";
 
-  //double bin  = 50;  double min = 0;  double max = 1000;
-  double bin  = 50;  double min = -18;  double max = -2;
+  double bin  = 50;  double min = 0;  double max = 1000;
+  //double bin  = 50;  double min = -18;  double max = -2;
 
   TH1F *h1 = (TH1F*) makeHisto(dir.c_str(),fsig.c_str(),rdir.c_str(),var.c_str(),cut.c_str(),bin,min,max);
   TH1F *h2 = (TH1F*) makeHisto(dir.c_str(),fbkg.c_str(),rdir.c_str(),var.c_str(),cut.c_str(),bin,min,max);
@@ -67,15 +67,15 @@ void Plot_General_sig_bkg(bool save = false){
   c2->cd();
   h1->SetLineColor(c_h1);
   h1->Draw();
-  //if(save) c2->SaveAs((dir+"/Plot_"+var+"_"+dir+"_sig.eps").c_str());
-  if(save) c2->SaveAs((dir+"/Plot_LogChi_"+dir+"_sig.eps").c_str());
+  if(save) c2->SaveAs((dir+"/Plot_"+var+"_"+dir+"_sig.eps").c_str());
+  //if(save) c2->SaveAs((dir+"/Plot_LogChi_"+dir+"_sig.eps").c_str());
 
   c3->cd();
   h2->SetLineColor(c_h2);
   h2->SetLineStyle(2);
   h2->Draw();
-  //if(save) c3->SaveAs((dir+"/Plot_"+var+"_"+dir+"_bkg.eps").c_str());
-  if(save) c3->SaveAs((dir+"/Plot_LogChi_"+dir+"_bkg.eps").c_str());
+  if(save) c3->SaveAs((dir+"/Plot_"+var+"_"+dir+"_bkg.eps").c_str());
+  //if(save) c3->SaveAs((dir+"/Plot_LogChi_"+dir+"_bkg.eps").c_str());
 
   //c->SetGrid();
   c->cd();
@@ -119,21 +119,25 @@ void Plot_General_sig_bkg(bool save = false){
 
   gPad->Update();
 
-  //if(save) c->SaveAs((dir+"/Plot_"+var+"_"+dir+"_All.eps").c_str());
-  if(save) c->SaveAs((dir+"/Plot_LogChi_"+dir+"_All.eps").c_str());
+  if(save) c->SaveAs((dir+"/Plot_"+var+"_"+dir+"_All.eps").c_str());
+  //if(save) c->SaveAs((dir+"/Plot_LogChi_"+dir+"_All.eps").c_str());
   //c->SetLogy();
   //if(save)c->SaveAs((dir+"/Plot_"+var+"_"+dir+"_logyscale.eps").c_str());
 
 }
 
 void Plot_General_Fj_gen(bool save = false){
+  std::string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
+  std::string fsig ="RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_mc_subjets";
+  std::string fbkg ="ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_mc_subjets";
+
   //std::string dir = "noMinFatjetPt_noMjBtagCondition";
   //std::string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_mc_subjets" ;
   //std::string fbkg = "TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_mc_subjets" ;
 
-  std::string dir = "1leadbtagmjcondition";
-  std::string fsig ="RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets";
-  std::string fbkg ="TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets";
+  //std::string dir = "1leadbtagmjcondition";
+  //std::string fsig ="RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets";
+  //std::string fbkg ="TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets";
 
   std::string rdir = "btaganaSubJets";
   std::string rdir_gen = "btagana";
@@ -141,20 +145,18 @@ void Plot_General_Fj_gen(bool save = false){
   std::string var = "FatJetInfo.Jet_pt";
   std::string var_gen = "GenPruned_pT";
 
-  std::string cut_H = "GenPruned_pdgID==25";
-  std::string cut_top = "GenPruned_pdgID==6";
+  std::string cut_gen = "GenPruned_pdgID==25";
+  //std::string cut_gen = "GenPruned_pdgID==6";
   std::string cut = "FatJetInfo.nJet>0";
   //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0";
   //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_SD_isLeadMicrojetBtag>0";
   //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_SD_isLeadMicrojetBtag>0&&FatJetInfo.Jet_pt>200";
   //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_SD_isLeadMicrojetBtag>0&&FatJetInfo.Jet_pt>200&&FatJetInfo.Jet_SD_nBtagMicrojets>1";
 
-  double bin  = 50;
-  double min = 0;
-  double max = 1000;
+  double bin  = 50;  double min = 0;  double max = 1000;
 
   TH1F *h1 = (TH1F*) makeHisto(dir.c_str(),fsig.c_str(),rdir.c_str(),var.c_str(),cut.c_str(),bin,min,max);
-  TH1F *h2 = (TH1F*) makeHisto(dir.c_str(),fsig.c_str(),rdir_gen.c_str(),var_gen.c_str(),cut_H.c_str(),bin,min,max);
+  TH1F *h2 = (TH1F*) makeHisto(dir.c_str(),fsig.c_str(),rdir_gen.c_str(),var_gen.c_str(),cut_gen.c_str(),bin,min,max);
 
   Color_t c_h1 = kBlue;
   Color_t c_h2 = kGreen+2;
@@ -177,7 +179,7 @@ void Plot_General_Fj_gen(bool save = false){
   h2->SetLineColor(c_h2);
   h2->SetLineStyle(2);
   h2->Draw();
-  if(save) c3->SaveAs((dir+"/Plot_"+var_gen+"_"+dir+"_sig_genH.eps").c_str());
+  if(save) c3->SaveAs((dir+"/Plot_"+var_gen+"_"+dir+"_sig_"+cut_gen+"_.eps").c_str());
 
   //c->SetGrid();
   c->cd();
@@ -199,7 +201,7 @@ void Plot_General_Fj_gen(bool save = false){
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
   leg->AddEntry(h1,"Reco Fatjet","L");
-  leg->AddEntry(h2,"Gen Higgs","L");
+  leg->AddEntry(h2,"Gen Particle","L");
 
   leg->Draw("SAME");
 
@@ -219,24 +221,9 @@ void Plot_General_Fj_gen(bool save = false){
   tps2->SetY1NDC(Y1-(Y2-Y1));
   tps2->SetY2NDC(Y1);
 
-  X1 = tps2->GetX1NDC();
-  Y1 = tps2->GetY1NDC();
-  X2 = tps2->GetX2NDC();
-  Y2 = tps2->GetY2NDC();
-
-  /*
-  TPaveStats *tps3 = (TPaveStats*) h3->FindObject("stats");
-  tps2->SetName("QCD p_{T} 470to800");
-  tps3->SetTextColor(kRed+3);
-  tps3->SetX1NDC(X1);
-  tps3->SetX2NDC(X2);
-  tps3->SetY1NDC(Y1-(Y2-Y1));
-  tps3->SetY2NDC(Y1);
-  */
-
   gPad->Update();
 
-  if(save) c->SaveAs((dir+"/Plot_"+var+"_"+var_gen+"_"+dir+"_Fj_genH.eps").c_str());
+  if(save) c->SaveAs((dir+"/Plot_"+var+"_"+var_gen+"_"+dir+"_Fj_gen_"+cut_gen+"_.eps").c_str());
 
 }
 
