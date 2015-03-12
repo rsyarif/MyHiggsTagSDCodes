@@ -49,6 +49,7 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
   float Fj_pt;
   float gen_pt;
   int Fj_nBtagMj;
+  cout<<"Creating new root file containing Fatjet based tree: "<< fdir+"/"+"fMatch_"+fname+"_"+postfix+".root" << endl;
   TFile *fMatch = new TFile((fdir+"/"+"fMatch_"+fname+"_"+postfix+".root").c_str(),"RECREATE"); //DIFFERENCE BETWEEN USING POINTER???
   TTree *tr_new = new TTree("tree","tree");
   tr_new->Branch("dR_match",&dR_match,"dR_match/F");
@@ -200,12 +201,18 @@ double deltaR(double eta1, double phi1, double eta2, double phi2){
   return dR;
 }
 
-void PartonMatch(){
-  string dir = "1leadbtagmjcondition";
-  string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets";
-  string fbkg = "TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets";
+void PartonMatch(bool display = false){
+  //string dir = "1leadbtagmjcondition";
+  //string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets";
+  //string fbkg = "TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets";
+
+  string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
+  string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_mc_subjets";
+  string fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_mc_subjets";
+
   double dR_tight = 0.05;double dR_med = 0.2;  double dR_loose = 1.2;
-  bool display = false ;
+
+  //bool display = false ;
 
   string postfix;
 
@@ -221,10 +228,15 @@ void PartonMatch(){
 }
 
 
-void makeHistos(){
-  string dir = "1leadbtagmjcondition";
-  string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets";
-  string fbkg = "TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets";
+void makeHistos(bool save = false, bool display = false){
+  //string dir = "1leadbtagmjcondition";
+  //string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets";
+  //string fbkg = "TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets";
+
+  string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
+  string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_mc_subjets";
+  string fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_mc_subjets";
+
   string var = "dR_match";
 
   double dR_tight = 0.05;double dR_med = 0.2;  double dR_loose = 1.2;
@@ -232,8 +244,8 @@ void makeHistos(){
   double xbin = 40; double xmin = -18; double xmax = -2;
   double ybin = 40; double ymin = 0; double ymax = 1.2;
 
-  bool display = false ;
-  bool save = false;
+  //bool display = false ;
+  //bool save = false;
 
   string postfix;
 
@@ -274,6 +286,7 @@ void makeHistos(){
   TCanvas* canvas4 = new TCanvas("sig matching","sig matching",800,600);
   TCanvas* canvas5 = new TCanvas("bkg matching","bkg matching",800,600);
 
+  cout<<"Creating "<< dir+"/"+"PartonMatch_histos.root"<< endl;
   TFile *fhistos = new TFile((dir+"/"+"PartonMatch_histos.root").c_str(),"RECREATE");
   //TFile *fhistos = new TFile("TEMP_PartonMatch_histos.root","RECREATE");
 
@@ -324,7 +337,7 @@ void makeHistos(){
 
   gPad->Update();
 
-  canvas->SaveAs("1leadbtagmjcondition/loose_match.eps");
+  canvas->SaveAs((dir+"/loose_match.eps").c_str());
   canvas->Write();
 
   canvas2->cd();
@@ -346,7 +359,7 @@ void makeHistos(){
 
   gPad->Update();
 
-  canvas2->SaveAs("1leadbtagmjcondition/medium_match.eps");
+  canvas2->SaveAs((dir+"/medium_match.eps").c_str());
   canvas2->Write();
 
   canvas3->cd();
@@ -368,7 +381,7 @@ void makeHistos(){
   leg3->AddEntry(h_bkg_t,"ttjets","L");
   leg3->Draw("SAME");
 
-  canvas3->SaveAs("1leadbtagmjcondition/tight_match.eps");
+  canvas3->SaveAs((dir+"/tight_match.eps").c_str());
   canvas3->Write();
 
   canvas4->cd();
@@ -397,7 +410,7 @@ void makeHistos(){
 
   gPad->Update();
 
-  canvas4->SaveAs("1leadbtagmjcondition/sig_match.eps");
+  canvas4->SaveAs((dir+"/sig_match.eps").c_str());
   canvas4->Write();
 
   canvas5->cd();
@@ -426,7 +439,7 @@ void makeHistos(){
 
   gPad->Update();
 
-  canvas5->SaveAs("1leadbtagmjcondition/bkg_match.eps");
+  canvas5->SaveAs((dir+"/bkg_match.eps").c_str());
   canvas5->Write();
 
   fhistos->Close();
