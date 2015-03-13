@@ -177,7 +177,7 @@ TH2D* PartonMatch_2D(TFile* f, std::string yvar, double xbin, double xmin, doubl
 TH1D* PartonMatch_1D(TFile* f, std::string var, double xbin, double xmin, double xmax, std::string postfix, Color_t color = kBlue, int linestyle = 1){
 
   TTree *t = f->Get("tree");
-  TH1D* h = new TH1D ("h","h",xbin,xmin,xmax);
+  TH1D* h = new TH1D (postfix.c_str(),postfix.c_str(),xbin,xmin,xmax);
   t->Draw((var+">>+h").c_str());
 
   h->SetLineWidth(2);
