@@ -1,5 +1,5 @@
 
-TH1F* makeHisto(std::string dir, TFile *f, std::string fname, std::string rdir ,std::string var, std::string cut="", double bin, double min, double max, Color_t color = kBlue, int linestyle = 1, bool save = false){
+TH1F* makeHisto(std::string dir, TFile *f, std::string fname, std::string rdir ,std::string var, std::string cut="", double bin, double min, double max, Color_t color = kBlue, int linestyle = 1, bool save = false, bool statbox = false){
 
   TDirectoryFile *df = f->GetDirectory(rdir.c_str());
   TTree *tf = df->Get("ttree");
@@ -20,7 +20,7 @@ TH1F* makeHisto(std::string dir, TFile *f, std::string fname, std::string rdir ,
 
   if(save) c1->SaveAs((dir+"/"+fname+cut+var+".eps").c_str());
 
-  h->SetStats(0);
+  h->SetStats(statbox);
 
   return h;
 }
@@ -29,46 +29,33 @@ void Plot_General_sig_bkg(bool save = false){
   std::string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
   std::string fsig ="RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_mc_subjets";
   std::string fbkg ="ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_mc_subjets";
-
-  //std::string dir = "noMinFatjetPt_noMjBtagCondition";
-  //std::string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_mc_subjets" ;
-  //std::string fbkg = "TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_mc_subjets" ;
-
-  //std::string dir = "1leadbtagmjcondition";
-  //std::string fsig ="RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets";
-  //std::string fbkg ="TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets";
-
   std::string rdir = "btaganaSubJets";
 
-  //std::string var = "log(FatJetInfo.Jet_SD_chi)";
-  //std::string var = "FatJetInfo.Jet_pt";
-  std::string var = "FatJetInfo.Jet_SD_nBtagMicrojets";
-
+  //std::string var = "log(FatJetInfo.Jet_SD_chi)"; std::string var_ = "LogChi";
+  std::string var = "FatJetInfo.Jet_pt"; std::string var_ = "FatJetInfo.Jet_pt";
+  //std::string var = "FatJetInfo.Jet_SD_nBtagMicrojets"; std::string var_ = "FatJetInfo.Jet_SD_nBtagMicrojets";
 
   //std::string cut = "FatJetInfo.nJet>0";
   //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_pt>200";
-  std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0";
-  //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_pt>200";
+  //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi<=0";
+  //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0";
+  std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_pt>200";
   //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_pt>200&&FatJetInfo.Jet_SD_nBtagMicrojets>1";
   //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_SD_isLeadMicrojetBtag>0&&FatJetInfo.Jet_pt>200&&FatJetInfo.Jet_SD_nBtagMicrojets>1";
 
-  double bin  = 8;  double min = -0.5;  double max = 7.5;
-  //double bin  = 50;  double min = 0;  double max = 1000;
+  //double bin  = 8;  double min = -0.5;  double max = 7.5;
+  double bin  = 50;  double min = 0;  double max = 1000;
   //double bin  = 50;  double min = -18;  double max = -2;
 
   TFile *fs = new TFile((dir+"/"+fsig+".root").c_str());
   TFile *fb = new TFile((dir+"/"+fbkg+".root").c_str());
-
   Color_t c_h1 = kBlue;
   Color_t c_h2 = kRed;
-
-  TH1F *h1 = (TH1F*) makeHisto(dir,fs,fsig,rdir,var,cut,bin,min,max,c_h1,1,true);
-  TH1F *h2 = (TH1F*) makeHisto(dir,fb,fbkg,rdir,var,cut,bin,min,max,c_h2,1,true);
-
+  TH1F *h1 = (TH1F*) makeHisto(dir,fs,fsig,rdir,var,cut,bin,min,max,c_h1,1,false,true);
+  TH1F *h2 = (TH1F*) makeHisto(dir,fb,fbkg,rdir,var,cut,bin,min,max,c_h2,1,false,true);
   TCanvas *c = new TCanvas("SD", "SD",800, 600);
   TCanvas *c2 = new TCanvas("SD - sig", "SD - sig",800, 600);
   TCanvas *c3 = new TCanvas("SD - bkg", "SD - bkg",800, 600);
-
 
   h1->SetStats(1);
   h2->SetStats(1);
@@ -77,20 +64,13 @@ void Plot_General_sig_bkg(bool save = false){
 
   c2->cd();
   h1->Draw();
-  if(save) c2->SaveAs((dir+"/Plot_"+var+"_"+dir+"_"+cut+"_sig.eps").c_str());
-  //if(save) c2->SaveAs((dir+"/Plot_LogChi_"+dir+"_sig.eps").c_str());
-
+  if(save) c2->SaveAs((dir+"/Plot_"+var_+"_"+dir+"_"+cut+"_sig.eps").c_str());
   c3->cd();
   h2->Draw();
-  if(save) c3->SaveAs((dir+"/Plot_"+var+"_"+dir+"_"+cut+"_bkg.eps").c_str());
-  //if(save) c3->SaveAs((dir+"/Plot_LogChi_"+dir+"_bkg.eps").c_str());
+  if(save) c3->SaveAs((dir+"/Plot_"+var_+"_"+dir+"_"+cut+"_bkg.eps").c_str());
 
-  //c->SetGrid();
+
   c->cd();
-
-  //h1->SetStats(0);
-  //h2->SetStats(0);
-
   Double_t norm1 = h1->GetEntries();
   h1->Scale(1/norm1);
   Double_t norm2 = h2->GetEntries();
@@ -98,8 +78,8 @@ void Plot_General_sig_bkg(bool save = false){
 
   h1->SetTitle("");
 
-  h2->Draw();
-  h1->Draw("SAMES");
+  h1->Draw();
+  h2->Draw("SAMES");
 
   leg = new TLegend(0.6,0.65,0.8,0.85);
   leg->SetFillStyle(0);
@@ -110,7 +90,6 @@ void Plot_General_sig_bkg(bool save = false){
   leg->Draw("SAME");
 
   TPaveStats *tps1 = (TPaveStats*) h1->FindObject("stats");
-  //tps1->SetName("Radion M800");
   tps1->SetTextColor(c_h1);
   double X1 = tps1->GetX1NDC();
   double Y1 = tps1->GetY1NDC();
@@ -118,7 +97,6 @@ void Plot_General_sig_bkg(bool save = false){
   double Y2 = tps1->GetY2NDC();
 
   TPaveStats *tps2 = (TPaveStats*) h2->FindObject("stats");
-  //tps2->SetName("TTJets");
   tps2->SetTextColor(c_h2);
   tps2->SetX1NDC(X1);
   tps2->SetX2NDC(X2);
@@ -128,9 +106,6 @@ void Plot_General_sig_bkg(bool save = false){
   gPad->Update();
 
   if(save) c->SaveAs((dir+"/Plot_"+var+"_"+dir+"_"+cut+"_All.eps").c_str());
-  //if(save) c->SaveAs((dir+"/Plot_LogChi_"+dir+"_All.eps").c_str());
-  //c->SetLogy();
-  //if(save)c->SaveAs((dir+"/Plot_"+var+"_"+dir+"_logyscale.eps").c_str());
 
 }
 
@@ -219,44 +194,23 @@ void Plot_General_Fj_gen(bool save = false){
   double bin  = 50;  double min = 0;  double max = 1000;
 
   TFile *fs = new TFile((dir+"/"+fsig+".root").c_str());
-  TFile *fb = new TFile((dir+"/"+fbkg+".root").c_str());
 
-  TH1F *h1 = (TH1F*) makeHisto(fs,fsig,rdir,var,cut,bin,min,max);
-  TH1F *h2 = (TH1F*) makeHisto(fs,fsig,rdir_gen,var_gen,cut_gen,bin,min,max);
+  TH1F *h1 = (TH1F*) makeHisto(dir,fs,fsig,rdir,var,cut,bin,min,max,kBlue,1,save,true);
+  TH1F *h2 = (TH1F*) makeHisto(dir,fs,fsig,rdir_gen,var_gen,cut_gen,bin,min,max,kGreen+1,1,save,true);
 
   Color_t c_h1 = kBlue;
   Color_t c_h2 = kGreen+2;
 
   TCanvas *c = new TCanvas("SD", "SD",800, 600);
-  TCanvas *c2 = new TCanvas("SD - sig", "SD - sig",800, 600);
-  TCanvas *c3 = new TCanvas("SD - bkg", "SD - bkg",800, 600);
 
   gStyle->SetOptStat("nemrou");
 
-  h1->SetStats(1);
-  h2->SetStats(1);
-
-  c2->cd();
-  h1->SetLineColor(c_h1);
-  h1->Draw();
-  if(save) c2->SaveAs((dir+"/Plot_"+var+"_"+dir+"_sig_noFjPtCut.eps").c_str());
-
-  c3->cd();
-  h2->SetLineColor(c_h2);
-  h2->SetLineStyle(2);
-  h2->Draw();
-  if(save) c3->SaveAs((dir+"/Plot_"+var_gen+"_"+dir+"_sig_"+cut_gen+"_.eps").c_str());
-
-  //c->SetGrid();
   c->cd();
 
   Double_t norm1 = h1->GetEntries();
   h1->Scale(1/norm1);
   Double_t norm2 = h2->GetEntries();
   h2->Scale(1/norm2);
-
-  //h1->SetStats(0);
-  //h2->SetStats(0);
 
   h1->SetTitle("");
 
