@@ -93,7 +93,8 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
 	    nMatch++;
 	    //----Determine Cuts conditions---- sync with postfix !!!
 	    //if(GenPruned_pT[k]<=200)continue;
-	    if(FatJetInfo_Jet_SD_chi[j]>0){
+	    //if(FatJetInfo_Jet_SD_chi[j]<=0){
+	    //if(FatJetInfo_Jet_SD_chi[j]>0){
 	    //if(FatJetInfo_Jet_SD_chi[j]>0 && FatJetInfo_Jet_pt[j]>200){
 
 	      dR_match = dR;
@@ -103,7 +104,7 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
 	      Fj_nBtagMj = FatJetInfo_Jet_SD_nBtagMicrojets[j];
 	      tr_new->Fill();
 
-	    }
+	    //}
 	  }//end if dR requirement
 	}//end if pdgid
 
@@ -112,7 +113,7 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
       }//end GenPruned loop
       if(nMatch>nMatchMax) nMatchMax = nMatch;
     }//end fatjet loop
-    if (nMatch>2) iEventOverMatch.push_back(i);
+    if (nMatch>2) iEventOverMatch.push_back(i); //max 2 matches because there are 2 Higgs from RadionHH (so this is sample dependent!)
 
   }//end event loop
   tr_new->Print();
@@ -174,11 +175,15 @@ TH2D* PartonMatch_2D(TFile* f, std::string yvar, double xbin, double xmin, doubl
 }
 
 
-TH1D* PartonMatch_1D(TFile* f, std::string var, double xbin, double xmin, double xmax, std::string postfix, Color_t color = kBlue, int linestyle = 1){
+TH1D* PartonMatch_1D(std::string dir, TFile* f, std::string fname,  std::string var, std::string cut,  double xbin, double xmin, double xmax, std::string postfix, Color_t color = kBlue, int linestyle = 1,bool save = false){
+
+  TCanvas* cvs = new TCanvas((var+cut+postfix).c_str(),(var+cut+postfix).c_str(),800,600);
 
   TTree *t = f->Get("tree");
-  TH1D* h = new TH1D (postfix.c_str(),postfix.c_str(),xbin,xmin,xmax);
-  t->Draw((var+">>+h").c_str());
+  TH1D* h = new TH1D ((var+cut+postfix).c_str(),(var+cut+postfix).c_str(),xbin,xmin,xmax);
+  t->Draw((var+">>"+var+cut+postfix).c_str(),cut.c_str());
+
+  gStyle->SetOptStat("nemrou");
 
   h->SetLineWidth(2);
   h->SetLineColor(color);
@@ -187,6 +192,10 @@ TH1D* PartonMatch_1D(TFile* f, std::string var, double xbin, double xmin, double
   h->SetTitle("");
 
   delete t;
+
+  if(var=="log(Fj_chi)")var = "logChi";
+  if(save)cvs->SaveAs((dir+"/"+fname+"_"+var+"_"+cut+".eps").c_str());
+
   return h;
 }
 
@@ -203,29 +212,13 @@ double deltaR(double eta1, double phi1, double eta2, double phi2){
 }
 
 void PartonMatch(bool display = false){
-  //string dir = "1leadbtagmjcondition";
-  //string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets";
-  //string fbkg = "TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt200_1leadbtagmjcondition_mc_subjets";
-
   string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
   string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_mc_subjets";
   string fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_mc_subjets";
-
-  double dR_tight = 0.05;double dR_med = 0.2;  double dR_loose = 1.2;
-
-  //bool display = false ;
-
-  string postfix= "_NoGenPtCut_NoFjPtCut"; //PAY ATTENTION to what postfixes are, and check the cut conditions!!
-
-  //loose match
-  int sig_l = PartonMatch(dir,fsig,25,dR_loose,display,("dRmax12"+postfix).c_str());
-  int bkg_l = PartonMatch(dir,fbkg,6,dR_loose,display,("dRmax12"+postfix).c_str());
-  //med matc
-  int sig_m = PartonMatch(dir,fsig,25,dR_med,display,("dRmax02"+postfix).c_str());
-  int bkg_m = PartonMatch(dir,fbkg,6,dR_med,display,("dRmax02"+postfix).c_str());
-  //tight match
-  int sig_t = PartonMatch(dir,fsig,25,dR_tight,display,("dRmax005"+postfix).c_str());
-  int bkg_t = PartonMatch(dir,fbkg,6,dR_tight,display,("dRmax005"+postfix).c_str());
+  double dRmax = 1.2;
+  string postfix= "dRmax12_NoGenPtCut_NoFjPtCut_AllChi";
+  int sig_l = PartonMatch(dir,fsig,25,dRmax,display,postfix);
+  int bkg_l = PartonMatch(dir,fbkg,6,dRmax,display,postfix);
 }
 
 
@@ -253,32 +246,32 @@ void makeHistos(bool save = false, bool display = false){
   //loose match
   postfix = "dRmax12";
   TFile *f_sig_l = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH2D* h2_sig_l = PartonMatch_2D(f_sig_l,var,xbin,xmin,xmax,ybin,ymin,1.2,"dRmax12");
-  TH1D* h_sig_l = PartonMatch_1D(f_sig_l,"log(Fj_chi)",xbin,xmin,xmax,"dRmax12");
+  TH2D* h2_sig_l = PartonMatch_2D(dir,f_sig_l,var,xbin,xmin,xmax,ybin,ymin,1.2,"dRmax12");
+  TH1D* h_sig_l = PartonMatch_1D(dir,f_sig_l,fsig,"log(Fj_chi)",xbin,xmin,xmax,"dRmax12");
 
   TFile *f_bkg_l = new TFile((dir+"/"+"fMatch_"+fbkg+"_"+postfix+".root").c_str());
-  TH2D* h2_bkg_l = PartonMatch_2D(f_bkg_l,var,xbin,xmin,xmax,ybin,ymin,1.2,"dRmax12");
-  TH1D* h_bkg_l = PartonMatch_1D(f_bkg_l,"log(Fj_chi)",xbin,xmin,xmax,"dRmax12");
+  TH2D* h2_bkg_l = PartonMatch_2D(dir,f_bkg_l,var,xbin,xmin,xmax,ybin,ymin,1.2,"dRmax12");
+  TH1D* h_bkg_l = PartonMatch_1D(dir,f_bkg_l,fbkg,"log(Fj_chi)",xbin,xmin,xmax,"dRmax12");
 
   //med match
   postfix = "dRmax02";
   TFile *f_sig_m = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH2D* h2_sig_m = PartonMatch_2D(f_sig_m,var,xbin,xmin,xmax,ybin,ymin,0.2,"dRmax02");
-  TH1D* h_sig_m = PartonMatch_1D(f_sig_m,"log(Fj_chi)",xbin,xmin,xmax,"dRmax02");
+  TH2D* h2_sig_m = PartonMatch_2D(dir,f_sig_m,var,xbin,xmin,xmax,ybin,ymin,0.2,"dRmax02");
+  TH1D* h_sig_m = PartonMatch_1D(dir,f_sig_m,fsig,"log(Fj_chi)",xbin,xmin,xmax,"dRmax02");
 
   TFile *f_bkg_m = new TFile((dir+"/"+"fMatch_"+fbkg+"_"+postfix+".root").c_str());
-  TH2D* h2_bkg_m = PartonMatch_2D(f_bkg_m,var,xbin,xmin,xmax,ybin,ymin,0.2,"dRmax02");
-  TH1D* h_bkg_m = PartonMatch_1D(f_bkg_m,"log(Fj_chi)",xbin,xmin,xmax,"dRmax02");
+  TH2D* h2_bkg_m = PartonMatch_2D(dir,f_bkg_m,var,xbin,xmin,xmax,ybin,ymin,0.2,"dRmax02");
+  TH1D* h_bkg_m = PartonMatch_1D(dir,f_bkg_m,fbkg,"log(Fj_chi)",xbin,xmin,xmax,"dRmax02");
 
   //tight match
   postfix = "dRmax005";
   TFile *f_sig_t = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH2D* h2_sig_t = PartonMatch_2D(f_sig_t,var,xbin,xmin,xmax,ybin,ymin,0.05,"dRmax005");
-  TH1D* h_sig_t = PartonMatch_1D(f_sig_t,"log(Fj_chi)",xbin,xmin,xmax,"dRmax005");
+  TH2D* h2_sig_t = PartonMatch_2D(dir,f_sig_t,var,xbin,xmin,xmax,ybin,ymin,0.05,"dRmax005");
+  TH1D* h_sig_t = PartonMatch_1D(dir,f_sig_t,fsig,"log(Fj_chi)",xbin,xmin,xmax,"dRmax005");
 
   TFile *f_bkg_t = new TFile((dir+"/"+"fMatch_"+fbkg+"_"+postfix+".root").c_str());
-  TH2D* h2_bkg_t = PartonMatch_2D(f_bkg_t,var,xbin,xmin,xmax,ybin,ymin,0.05,"dRmax005");
-  TH1D* h_bkg_t = PartonMatch_1D(f_bkg_t,"log(Fj_chi)",xbin,xmin,xmax,"dRmax005");
+  TH2D* h2_bkg_t = PartonMatch_2D(dir,f_bkg_t,var,xbin,xmin,xmax,ybin,ymin,0.05,"dRmax005");
+  TH1D* h_bkg_t = PartonMatch_1D(dir,f_bkg_t,fbkg,"log(Fj_chi)",xbin,xmin,xmax,"dRmax005");
 
 
   TCanvas* canvas = new TCanvas("loose matching","loose matching",800,600);
@@ -447,45 +440,48 @@ void makeHistos(bool save = false, bool display = false){
 
 }
 
-void makeHistos_Fj_gen_pt(bool save = false, bool display = false){
+void makeHistos_Fj_gen_pt_4plots(bool save = false, bool display = false){
   string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
   string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_mc_subjets";
   string fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_mc_subjets";
+  string postfix = "dRmax12_NoGenPtCut_NoFjPtCut_AllChi";
+
   string var = "Fj_pt";
   string var_gen = "gen_pt";
-  double dR_tight = 0.05;double dR_med = 0.2;  double dR_loose = 1.2;
   double xbin = 50; double xmin = 0; double xmax = 1000;
-  string postfix;
+
+  string cut1 = "";
+  string cut2 = "Fj_chi>0";
+  string loose_cut1 = cut1;  string loose_cut2 = cut2;
+  string medium_cut1;string medium_cut2;
+  if(cut1==""){medium_cut1 = "dR_match<0.2";} else {medium_cut1 = ("dR_match<0.2&&"+cut1).c_str();}  ;
+  if(cut2==""){medium_cut2 = "dR_match<0.2";} else {medium_cut2 = ("dR_match<0.2&&"+cut2).c_str();}  ;
+  string tight_cut1;string tight_cut2;
+  if(cut1==""){tight_cut1 = "dR_match<0.05";} else {tight_cut1 = ("dR_match<0.05&&"+cut1).c_str();}  ;
+  if(cut2==""){tight_cut2 = "dR_match<0.05";} else {tight_cut2 = ("dR_match<0.05&&"+cut2).c_str();}  ;
+
+  Color_t color1= kBlue;
+  Color_t color2 = kGreen+1;
+
+  TFile *f_l = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
 
   //loose match
-  postfix = "dRmax12_NoGenPtCut_NoFjPtCut";
-  TFile *f_l = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH1D* h_fj_l = PartonMatch_1D(f_l,var,xbin,xmin,xmax,"",kBlue);
-  TH1D* h_gen_l = PartonMatch_1D(f_l,var_gen,xbin,xmin,xmax,"",kGreen+1);
-  postfix = "dRmax12";
-  TFile *f_l_2 = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH1D* h_fj_l_2 = PartonMatch_1D(f_l_2,var,xbin,xmin,xmax,"",kBlue,2);
-  TH1D* h_gen_l_2 = PartonMatch_1D(f_l_2,var_gen,xbin,xmin,xmax,"",kGreen+1,2);
+  TH1D* h_fj_l = PartonMatch_1D(dir,f_l,fsig,var,loose_cut1,xbin,xmin,xmax,postfix,color1,1,save);
+  TH1D* h_gen_l = PartonMatch_1D(dir,f_l,fsig,var_gen,loose_cut1,xbin,xmin,xmax,postfix,color2,1,save);
+  TH1D* h_fj_l_2 = PartonMatch_1D(dir,f_l,fsig,var,loose_cut2,xbin,xmin,xmax,postfix,color1,2,save);
+  TH1D* h_gen_l_2 = PartonMatch_1D(dir,f_l,fsig,var_gen,loose_cut2,xbin,xmin,xmax,postfix,color2,2,save);
 
   //medium match
-  postfix = "dRmax02_NoGenPtCut_NoFjPtCut";
-  TFile *f_m = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH1D* h_fj_m = PartonMatch_1D(f_m,var,xbin,xmin,xmax,"",kBlue);
-  TH1D* h_gen_m = PartonMatch_1D(f_m,var_gen,xbin,xmin,xmax,"",kGreen+1);
-  postfix = "dRmax02";
-  TFile *f_m_2 = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH1D* h_fj_m_2 = PartonMatch_1D(f_m_2,var,xbin,xmin,xmax,"",kBlue,2);
-  TH1D* h_gen_m_2 = PartonMatch_1D(f_m_2,var_gen,xbin,xmin,xmax,"",kGreen+1,2);
+  TH1D* h_fj_m = PartonMatch_1D(dir,f_l,fsig,var,medium_cut1,xbin,xmin,xmax,postfix,color1,1,save);
+  TH1D* h_gen_m = PartonMatch_1D(dir,f_l,fsig,var_gen,medium_cut1,xbin,xmin,xmax,postfix,color2,1,save);
+  TH1D* h_fj_m_2 = PartonMatch_1D(dir,f_l,fsig,var,medium_cut2,xbin,xmin,xmax,postfix,color1,2,save);
+  TH1D* h_gen_m_2 = PartonMatch_1D(dir,f_l,fsig,var_gen,medium_cut2,xbin,xmin,xmax,postfix,color2,2,save);
 
   //tight match
-  postfix = "dRmax005_NoGenPtCut_NoFjPtCut";
-  TFile *f_t = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH1D* h_fj_t = PartonMatch_1D(f_t,var,xbin,xmin,xmax,"",kBlue);
-  TH1D* h_gen_t = PartonMatch_1D(f_t,var_gen,xbin,xmin,xmax,"",kGreen+1);
-  postfix = "dRmax02";
-  TFile *f_t_2 = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH1D* h_fj_t_2 = PartonMatch_1D(f_t_2,var,xbin,xmin,xmax,"",kBlue,2);
-  TH1D* h_gen_t_2 = PartonMatch_1D(f_t_2,var_gen,xbin,xmin,xmax,"",kGreen+1,2);
+  TH1D* h_fj_t = PartonMatch_1D(dir,f_l,fsig,var,tight_cut1,xbin,xmin,xmax,postfix,color1,1,save);
+  TH1D* h_gen_t = PartonMatch_1D(dir,f_l,fsig,var_gen,tight_cut1,xbin,xmin,xmax,postfix,color2,1,save);
+  TH1D* h_fj_t_2 = PartonMatch_1D(dir,f_l,fsig,var,tight_cut2,xbin,xmin,xmax,postfix,color1,2,save);
+  TH1D* h_gen_t_2 = PartonMatch_1D(dir,f_l,fsig,var_gen,tight_cut2,xbin,xmin,xmax,postfix,color2,2,save);
 
   //---create canvas---
 
@@ -504,17 +500,17 @@ void makeHistos_Fj_gen_pt(bool save = false, bool display = false){
   h_gen_l->SetStats(0);
   h_fj_l_2->SetStats(0);
   h_gen_l_2->SetStats(0);
-  h_gen_l_2->DrawNormalized();
+  h_gen_l->DrawNormalized();
   h_fj_l->DrawNormalized("SAME");
-  h_gen_l->DrawNormalized("SAME");
+  h_gen_l_2->DrawNormalized("SAME");
   h_fj_l_2->DrawNormalized("SAME");
-  leg = new TLegend(0.7,0.65,0.9,0.85);
+  leg = new TLegend(0.6,0.65,0.9,0.85);
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
-  leg->AddEntry(h_fj_l,"fj - noGenPtCut","L");
-  leg->AddEntry(h_gen_l,"gen - noGenPtCut","L");
-  leg->AddEntry(h_fj_l_2,"fj - GenPtCut","L");
-  leg->AddEntry(h_gen_l_2,"gen - GenPtCut","L");
+  leg->AddEntry(h_fj_l,("fj "+cut1).c_str(),"L");
+  leg->AddEntry(h_gen_l,("gen "+cut1).c_str(),"L");
+  leg->AddEntry(h_fj_l_2,("fj "+cut2).c_str(),"L");
+  leg->AddEntry(h_gen_l_2,("gen "+cut2).c_str(),"L");
   leg->Draw("SAME");
   gPad->Update();
   if(save)canvas_l->SaveAs((dir+"/loose_match"+"_"+var+".eps").c_str());
@@ -525,17 +521,17 @@ void makeHistos_Fj_gen_pt(bool save = false, bool display = false){
   h_gen_m->SetStats(0);
   h_fj_m_2->SetStats(0);
   h_gen_m_2->SetStats(0);
-  h_gen_m_2->DrawNormalized();
+  h_gen_m->DrawNormalized();
   h_fj_m->DrawNormalized("SAME");
-  h_gen_m->DrawNormalized("SAME");
+  h_gen_m_2->DrawNormalized("SAME");
   h_fj_m_2->DrawNormalized("SAME");
-  leg = new TLegend(0.7,0.65,0.9,0.85);
+  leg = new TLegend(0.6,0.65,0.9,0.85);
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
-  leg->AddEntry(h_fj_m,"fj - noGenPtCut","L");
-  leg->AddEntry(h_gen_m,"gen - noGenPtCut","L");
-  leg->AddEntry(h_fj_m_2,"fj - GenPtCut","L");
-  leg->AddEntry(h_gen_m_2,"gen - GenPtCut","L");
+  leg->AddEntry(h_fj_m,("fj "+cut1).c_str(),"L");
+  leg->AddEntry(h_gen_m,("gen "+cut1).c_str(),"L");
+  leg->AddEntry(h_fj_m_2,("fj "+cut2).c_str(),"L");
+  leg->AddEntry(h_gen_m_2,("gen "+cut2).c_str(),"L");
   leg->Draw("SAME");
   gPad->Update();
   if(save)canvas_m->SaveAs((dir+"/medium_match"+"_"+var+".eps").c_str());
@@ -550,13 +546,13 @@ void makeHistos_Fj_gen_pt(bool save = false, bool display = false){
   h_fj_t->DrawNormalized("SAME");
   h_gen_t_2->DrawNormalized("SAME");
   h_fj_t_2->DrawNormalized("SAME");
-  leg = new TLegend(0.7,0.65,0.9,0.85);
+  leg = new TLegend(0.6,0.65,0.9,0.85);
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
-  leg->AddEntry(h_fj_t,"fj - noGenPtCut","L");
-  leg->AddEntry(h_gen_t,"gen - noGenPtCut","L");
-  leg->AddEntry(h_fj_t_2,"fj - GenPtCut","L");
-  leg->AddEntry(h_gen_t_2,"gen - GenPtCut","L");
+  leg->AddEntry(h_fj_t,("fj "+cut1).c_str(),"L");
+  leg->AddEntry(h_gen_t,("gen "+cut1).c_str(),"L");
+  leg->AddEntry(h_fj_t_2,("fj "+cut2).c_str(),"L");
+  leg->AddEntry(h_gen_t_2,("gen "+cut2).c_str(),"L");
   leg->Draw("SAME");
   gPad->Update();
   if(save)canvas_t->SaveAs((dir+"/tight_match"+"_"+var+".eps").c_str());
@@ -568,33 +564,35 @@ void makeHistos_Fj_gen_chi(bool save = false, bool display = false){
   string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_mc_subjets";
   string fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_mc_subjets";
   string var = "log(Fj_chi)";
-  double dR_tight = 0.05;double dR_med = 0.2;  double dR_loose = 1.2;
+  double dR_tight = 0.05; double dR_med = 0.2;  double dR_loose = 1.2;
   double xbin = 40; double xmin = -18; double xmax = -2;
   string postfix;
+  string postfix1 = "NoGenPtCut_NoFjPtCut"; Color_t color1= kBlue;
+  string postfix2 = "NoGenPtCut_NoFjPtCut_InvalidChiCut"; Color_t color2 = kGreen+1;
 
   //loose match
-  postfix = "dRmax005_NoGenPtCut_NoFjPtCut";
+  postfix = "dRmax12_"+postfix1;
   TFile *f_l = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH1D* h_fj_l = PartonMatch_1D(f_l,var,xbin,xmin,xmax,"",kBlue);
-  postfix = "dRmax005";
+  TH1D* h_fj_l = PartonMatch_1D(dir,f_l,fsig,var,xbin,xmin,xmax,postfix,color1,1,save);
+  postfix = "dRmax12_"+postfix2;
   TFile *f_l_2 = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH1D* h_fj_l_2 = PartonMatch_1D(f_l_2,var,xbin,xmin,xmax,"",kBlue,2);
+  TH1D* h_fj_l_2 = PartonMatch_1D(dir,f_l_2,fsig,var,xbin,xmin,xmax,postfix,color1,2,save);
 
   //medium match
-  postfix = "dRmax02_NoGenPtCut_NoFjPtCut";
+  postfix = "dRmax02_"+postfix1;
   TFile *f_m = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH1D* h_fj_m = PartonMatch_1D(f_m,var,xbin,xmin,xmax,"",kBlue);
-  postfix = "dRmax02";
+  TH1D* h_fj_m = PartonMatch_1D(dir,f_m,fsig,var,xbin,xmin,xmax,postfix,color1,1,save);
+  postfix = "dRmax02_"+postfix2;
   TFile *f_m_2 = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH1D* h_fj_m_2 = PartonMatch_1D(f_m_2,var,xbin,xmin,xmax,"",kBlue,2);
+  TH1D* h_fj_m_2 = PartonMatch_1D(dir,f_m_2,fsig,var,xbin,xmin,xmax,postfix,color1,2,save);
 
   //tight match
-  postfix = "dRmax005_NoGenPtCut_NoFjPtCut";
+  postfix = "dRmax005_"+postfix1;
   TFile *f_t = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH1D* h_fj_t = PartonMatch_1D(f_t,var,xbin,xmin,xmax,"",kBlue);
-  postfix = "dRmax005";
+  TH1D* h_fj_t = PartonMatch_1D(dir,f_t,fsig,var,xbin,xmin,xmax,postfix,color1,1,save);
+  postfix = "dRmax005_"+postfix2;
   TFile *f_t_2 = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
-  TH1D* h_fj_t_2 = PartonMatch_1D(f_t_2,var,xbin,xmin,xmax,"",kBlue,2);
+  TH1D* h_fj_t_2 = PartonMatch_1D(dir,f_t_2,fsig,var,xbin,xmin,xmax,postfix,color1,2,save);
 
 
   TCanvas* canvas_l = new TCanvas("loose matching","loose matching",800,600);
@@ -612,14 +610,14 @@ void makeHistos_Fj_gen_chi(bool save = false, bool display = false){
   h_fj_l_2->SetStats(0);
   h_fj_l->DrawNormalized();
   h_fj_l_2->DrawNormalized("SAME");
-  leg = new TLegend(0.7,0.65,0.9,0.85);
+  leg = new TLegend(0.6,0.65,0.9,0.85);
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
-  leg->AddEntry(h_fj_l,"fj - noGenPtCut","L");
-  leg->AddEntry(h_fj_l_2,"fj - GenPtCut","L");
+  leg->AddEntry(h_fj_l,("fj - "+postfix1).c_str(),"L");
+  leg->AddEntry(h_fj_l_2,("fj - "+postfix2).c_str(),"L");
   leg->Draw("SAME");
   gPad->Update();
-  if(save)canvas_l->SaveAs((dir+"/loose_match"+"_logChi.eps").c_str());
+  if(save)canvas_l->SaveAs((dir+"/loose_match"+"_logChi"+".eps").c_str());
 
   //--------medium-----------
   canvas_m->cd();
@@ -627,14 +625,14 @@ void makeHistos_Fj_gen_chi(bool save = false, bool display = false){
   h_fj_m_2->SetStats(0);
   h_fj_m->DrawNormalized();
   h_fj_m_2->DrawNormalized("SAME");
-  leg = new TLegend(0.7,0.65,0.9,0.85);
+  leg = new TLegend(0.6,0.65,0.9,0.85);
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
-  leg->AddEntry(h_fj_m,"fj - noGenPtCut","L");
-  leg->AddEntry(h_fj_m_2,"fj - GenPtCut","L");
+  leg->AddEntry(h_fj_m,("fj - "+postfix1).c_str(),"L");
+  leg->AddEntry(h_fj_m_2,("fj - "+postfix2).c_str(),"L");
   leg->Draw("SAME");
   gPad->Update();
-  if(save)canvas_m->SaveAs((dir+"/medium_match"+"_logChi.eps").c_str());
+  if(save)canvas_m->SaveAs((dir+"/medium_match"+"_logChi"+".eps").c_str());
 
   //--------tight-----------
   canvas_t->cd();
@@ -642,14 +640,14 @@ void makeHistos_Fj_gen_chi(bool save = false, bool display = false){
   h_fj_t_2->SetStats(0);
   h_fj_t->DrawNormalized();
   h_fj_t_2->DrawNormalized("SAME");
-  leg = new TLegend(0.7,0.65,0.9,0.85);
+  leg = new TLegend(0.6,0.65,0.9,0.85);
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
-  leg->AddEntry(h_fj_t,"fj - noGenPtCut","L");
-  leg->AddEntry(h_fj_t_2,"fj - GenPtCut","L");
+  leg->AddEntry(h_fj_t,("fj - "+postfix).c_str(),"L");
+  leg->AddEntry(h_fj_t_2,("fj - "+postfix).c_str(),"L");
   leg->Draw("SAME");
   gPad->Update();
-  if(save)canvas_t->SaveAs((dir+"/tight_match"+"_logChi.eps").c_str());
+  if(save)canvas_t->SaveAs((dir+"/tight_match"+"_logChi"+".eps").c_str());
 
 }
 
