@@ -1,9 +1,10 @@
 
-TH1F* makeHisto(std::string dir, TFile *f, std::string fname, std::string rdir ,std::string var, std::string cut="", double bin, double min, double max, Color_t color = kBlue, int linestyle = 1, bool save = false, bool statbox = false){
+TH1F* makeHisto(std::string dir, TFile *f, std::string fname, std::string rdir ,std::string var, std::string var_, std::string cut="", double bin, double min, double max, std::string xlabel, std::string ylabel, Color_t color = kBlue, int linestyle = 1, bool save = false, bool statbox = false){
 
   TDirectoryFile *df = f->GetDirectory(rdir.c_str());
   TTree *tf = df->Get("ttree");
 
+  TCanvas *c1 = new TCanvas("c1","c1",800,600);
   TH1F *h = new TH1F(fname.c_str(),fname.c_str(),bin,min,max);
 
   tf->Draw((var+">>"+fname).c_str(),cut.c_str());
@@ -12,63 +13,42 @@ TH1F* makeHisto(std::string dir, TFile *f, std::string fname, std::string rdir ,
   h->SetLineColor(color);
   h->SetLineWidth(2);
   h->SetLineStyle(linestyle);
-  h->GetXaxis()->SetTitle(var.c_str());
+  h->GetXaxis()->SetTitle(xlabel.c_str());
   h->GetXaxis()->SetTitleOffset(1.2);
-  h->GetYaxis()->SetTitle("Entries");
+  h->GetYaxis()->SetTitle(ylabel.c_str());
   h->GetYaxis()->SetTitleOffset(1.2);
   h->SetTitle("");
 
-  if(save) c1->SaveAs((dir+"/"+fname+cut+var+".eps").c_str());
+  if(save) c1->SaveAs((dir+"/"+fname+"_"+cut+"_"+var_+"_"+".eps").c_str());
 
   h->SetStats(statbox);
 
   return h;
 }
 
-void Plot_General_sig_bkg(bool save = false){
-  std::string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
-  std::string fsig ="RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_mc_subjets";
-  std::string fbkg ="ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_mc_subjets";
-  std::string rdir = "btaganaSubJets";
-
-  //std::string var = "log(FatJetInfo.Jet_SD_chi)"; std::string var_ = "LogChi";
-  std::string var = "FatJetInfo.Jet_pt"; std::string var_ = "FatJetInfo.Jet_pt";
-  //std::string var = "FatJetInfo.Jet_SD_nBtagMicrojets"; std::string var_ = "FatJetInfo.Jet_SD_nBtagMicrojets";
-
-  //std::string cut = "FatJetInfo.nJet>0";
-  //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_pt>200";
-  //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi<=0";
-  //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0";
-  std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_pt>200";
-  //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_pt>200&&FatJetInfo.Jet_SD_nBtagMicrojets>1";
-  //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_SD_isLeadMicrojetBtag>0&&FatJetInfo.Jet_pt>200&&FatJetInfo.Jet_SD_nBtagMicrojets>1";
-
-  //double bin  = 8;  double min = -0.5;  double max = 7.5;
-  double bin  = 50;  double min = 0;  double max = 1000;
-  //double bin  = 50;  double min = -18;  double max = -2;
+void Plot_General_sig_bkg(bool save = false, std::string dir, std::string fsig, std::string fbkg, std::string rdir, std::string var, std::string var_, std::string cut, double bin, double min, double max, std::string xlabel, std::string ylabel){
 
   TFile *fs = new TFile((dir+"/"+fsig+".root").c_str());
   TFile *fb = new TFile((dir+"/"+fbkg+".root").c_str());
   Color_t c_h1 = kBlue;
   Color_t c_h2 = kRed;
-  TH1F *h1 = (TH1F*) makeHisto(dir,fs,fsig,rdir,var,cut,bin,min,max,c_h1,1,false,true);
-  TH1F *h2 = (TH1F*) makeHisto(dir,fb,fbkg,rdir,var,cut,bin,min,max,c_h2,1,false,true);
+  TH1F *h1 = (TH1F*) makeHisto(dir,fs,fsig,rdir,var,var_,cut,bin,min,max,xlabel,ylabel,c_h1,1,save,true);
+  TH1F *h2 = (TH1F*) makeHisto(dir,fb,fbkg,rdir,var,var_,cut,bin,min,max,xlabel,ylabel,c_h2,1,save,true);
   TCanvas *c = new TCanvas("SD", "SD",800, 600);
-  TCanvas *c2 = new TCanvas("SD - sig", "SD - sig",800, 600);
-  TCanvas *c3 = new TCanvas("SD - bkg", "SD - bkg",800, 600);
+  //TCanvas *c2 = new TCanvas("SD - sig", "SD - sig",800, 600);
+  //TCanvas *c3 = new TCanvas("SD - bkg", "SD - bkg",800, 600);
 
   h1->SetStats(1);
   h2->SetStats(1);
 
   gStyle->SetOptStat("nemrou");
 
-  c2->cd();
-  h1->Draw();
-  if(save) c2->SaveAs((dir+"/Plot_"+var_+"_"+dir+"_"+cut+"_sig.eps").c_str());
-  c3->cd();
-  h2->Draw();
-  if(save) c3->SaveAs((dir+"/Plot_"+var_+"_"+dir+"_"+cut+"_bkg.eps").c_str());
-
+  //c2->cd();
+  //h1->Draw();
+  //if(save) c2->SaveAs((dir+"/Plot_"+var_+"_"+dir+"_"+cut+"_sig.eps").c_str());
+  //c3->cd();
+  //h2->Draw();
+  //if(save) c3->SaveAs((dir+"/Plot_"+var_+"_"+dir+"_"+cut+"_bkg.eps").c_str());
 
   c->cd();
   Double_t norm1 = h1->GetEntries();
@@ -105,7 +85,7 @@ void Plot_General_sig_bkg(bool save = false){
 
   gPad->Update();
 
-  if(save) c->SaveAs((dir+"/Plot_"+var+"_"+dir+"_"+cut+"_All.eps").c_str());
+  if(save) c->SaveAs((dir+"/Plot_"+var_+"_"+dir+"_"+cut+"_All.eps").c_str());
 
 }
 
@@ -121,7 +101,6 @@ TCanvas*  SuperimposeHistos(int n, TH1F** h, int top = 0){
 
   return c;
 }
-
 
 void Plot_General_many(bool save=false){
   std::string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
@@ -162,7 +141,6 @@ void Plot_General_many(bool save=false){
   c->BuildLegend();
   if(save)c->SaveAs((dir+"/"+var+"_ALL.eps").c_str());
 }
-
 
 void Plot_General_Fj_gen(bool save = false){
   std::string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
@@ -244,6 +222,23 @@ void Plot_General_Fj_gen(bool save = false){
   gPad->Update();
 
   if(save) c->SaveAs((dir+"/Plot_"+var+"_"+var_gen+"_"+dir+"_Fj_gen_"+cut_gen+"_.eps").c_str());
+
+}
+
+void Alakazam(){
+
+  std::string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
+  std::string fsig ="RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_HiggsWin20_mc_subjets";
+  std::string fbkg ="ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_HiggsWin20_mc_subjets";
+  std::string rdir = "btaganaSubJets";
+
+  std::string cut = "FatJetInfo.nJet>0";
+  //std::string cut = "FatJetInfo.nJet>0&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_pt>200";
+
+  std::string var = "log(FatJetInfo.Jet_SD_chi)"; std::string var_ = "LogChi";
+  Plot_General_sig_bkg(true, dir, fsig, fbkg, rdir, var, var_, cut, 50,-22,-2,"Log(#chi)","");
+  std::string var = "FatJetInfo.Jet_pt"; std::string var_ = "pt";
+  Plot_General_sig_bkg(true, dir, fsig, fbkg, rdir, var, var_, cut, 50,0,1000,"p_{T}","");
 
 }
 
