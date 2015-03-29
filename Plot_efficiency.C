@@ -2,6 +2,7 @@
 #include <sstream>
 #include <string>
 #include <TFile.h>
+#include <TTree.h>
 #include <TH1D.h>
 #include <TGraph.h>
 #include <TCanvas.h>
@@ -14,23 +15,77 @@ using namespace std;
 //string dir = "1leadbtagmjcondition";
 //string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
 
-void Plot_efficiency(std::string dir = ""){
+TH1D* PartonMatch_1D(std::string dir, TFile* f, std::string fname,  std::string var, std::string cut,  double xbin, double xmin, double xmax, std::string xlabel, std::string postfix, Color_t color = kBlue, int linestyle = 1,bool save = false){
 
-  if(dir==""){
-    std::cout<< "Choose Directory!"<< endl;
-    return;
-  }
+  string var_ = var;
+  if(var_=="log(Fj_chi)") var_ = "logChi"; //log(Fj_chi) become log( for some reason???
 
-  TFile *f = new TFile((dir+"/"+"PartonMatch_histos.root").c_str());
+  TCanvas* cvs = new TCanvas((var_+cut+postfix).c_str(),(var_+cut+postfix).c_str(),800,600);
 
-  TH1D *h_sig_l = (TH1D*)f->Get("h_sig_l");
-  TH1D *h_bkg_l = (TH1D*)f->Get("h_bkg_l");
+  TTree *t = (TTree*)f->Get("tree");
+  TH1D* h = new TH1D ((var_+cut+postfix).c_str(),(var_+cut+postfix).c_str(),xbin,xmin,xmax);
 
-  TH1D *h_sig_m = (TH1D*)f->Get("h_sig_m");
-  TH1D *h_bkg_m = (TH1D*)f->Get("h_bkg_m");
+  t->Draw((var+">>"+var_+cut+postfix).c_str(),cut.c_str());
 
-  TH1D *h_sig_t = (TH1D*)f->Get("h_sig_t");
-  TH1D *h_bkg_t = (TH1D*)f->Get("h_bkg_t");
+  //gStyle->SetOptStat("nemrou");
+
+  h->SetLineWidth(2);
+  h->SetLineColor(color);
+  h->SetLineStyle(linestyle);
+  h->GetXaxis()->SetTitle(xlabel.c_str());
+  h->GetYaxis()->SetTitle("");
+  h->SetTitle("");
+
+  delete t;
+  if(save)cvs->SaveAs((dir+"/"+fname+"_"+var_+"_"+cut+".eps").c_str());
+
+  return h;
+}
+
+void Plot_efficiency(){
+  string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
+  string deltaHiggsMass = "HiggsWin10";
+  string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
+  string fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
+  string postfix = "dRmax12_NoGenPtCut_NoFjPtCut_AllChi";
+  double xbin = 40; double xmin = -18; double xmax = -2;
+  bool save = false;
+  string var = "log(Fj_chi)" ; string xlabel = "Log(#chi)";
+  string cut = "Fj_chi>0";
+  string loose_cut = cut;
+  string medium_cut; if(cut==""){medium_cut = "dR_match<0.2";} else {medium_cut = ("dR_match<0.2&&"+cut).c_str();}  ;
+  string tight_cut; if(cut==""){tight_cut = "dR_match<0.05";} else {tight_cut = ("dR_match<0.05&&"+cut).c_str();}  ;
+  Color_t color1= kBlue;
+  Color_t color2 = kRed;
+
+  //if(dir==""){
+  //  std::cout<< "Choose Directory!"<< endl;
+  //  return;
+  //}
+
+  //TFile *f = new TFile((dir+"/"+"PartonMatch_histos.root").c_str());
+
+  TFile *fs = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
+  TFile *fb = new TFile((dir+"/"+"fMatch_"+fbkg+"_"+postfix+".root").c_str());
+
+  TH1D* h_sig_l = PartonMatch_1D(dir,fs,fsig,var,loose_cut,xbin,xmin,xmax,xlabel,postfix,color1,1,save);
+  TH1D* h_bkg_l = PartonMatch_1D(dir,fb,fbkg,var,loose_cut,xbin,xmin,xmax,xlabel,postfix,color2,1,save);
+
+  TH1D* h_sig_m = PartonMatch_1D(dir,fs,fsig,var,medium_cut,xbin,xmin,xmax,xlabel,postfix,color1,1,save);
+  TH1D* h_bkg_m = PartonMatch_1D(dir,fb,fbkg,var,medium_cut,xbin,xmin,xmax,xlabel,postfix,color2,1,save);
+
+  TH1D* h_sig_t = PartonMatch_1D(dir,fs,fsig,var,tight_cut,xbin,xmin,xmax,xlabel,postfix,color1,1,save);
+  TH1D* h_bkg_t = PartonMatch_1D(dir,fb,fbkg,var,tight_cut,xbin,xmin,xmax,xlabel,postfix,color2,1,save);
+
+
+  //TH1D *h_sig_l = (TH1D*)f->Get("h_sig_l");
+  //TH1D *h_bkg_l = (TH1D*)f->Get("h_bkg_l");
+
+  //TH1D *h_sig_m = (TH1D*)f->Get("h_sig_m");
+  //TH1D *h_bkg_m = (TH1D*)f->Get("h_bkg_m");
+
+  //TH1D *h_sig_t = (TH1D*)f->Get("h_sig_t");
+  //TH1D *h_bkg_t = (TH1D*)f->Get("h_bkg_t");
 
 
   //float Ssig = 4688;
@@ -52,7 +107,7 @@ void Plot_efficiency(std::string dir = ""){
   double bkg_l_integral[bkg_l_nbins];
   double sig_l_eff[sig_l_nbins];
   double bkg_l_eff[bkg_l_nbins];
-  double x_l[sig_l_nbins]; double xmin = -18.; double xmax = -2.;
+  double x_l[sig_l_nbins]; //double xmin = -18.; double xmax = -2.;
   double increment = (xmax-xmin)/sig_l_nbins;
   cout <<"---loose---"<<endl;
   for(int i=0;i<sig_l_nbins;i++){
