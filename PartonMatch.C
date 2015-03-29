@@ -1,7 +1,7 @@
 
 using namespace std;
 
-int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax = 1.2,bool display=false, std::string postfix = ""){
+int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax = 1.2, double MjCone = 0.15, bool display=false, std::string postfix = ""){
 
   TFile *f = new TFile((fdir+"/"+fname+".root").c_str());
 
@@ -14,26 +14,40 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
   int nMatchMax = 0;
   vector<int> iEventOverMatch;
 
-  int nGenPruned;
   const int nGenPrunedMax = 25;
+
+  int nGenPruned;
   int GenPruned_pdgID[nGenPrunedMax];
-  float GenPruned_eta[nGenPrunedMax]; //simple hack to avoid making different size arrays every event loop. Run calcMax.C
+  float GenPruned_eta[nGenPrunedMax];
   float GenPruned_phi[nGenPrunedMax];
   float GenPruned_pT[nGenPrunedMax];
 
-  int FatJetInfo_nJet;
+
   const int nFjMax=5;
   const int nMjMax=50;
+  const int nSVMax=50;
+
+  int FatJetInfo_nJet;
   float FatJetInfo_Jet_eta[nFjMax];
   float FatJetInfo_Jet_phi[nFjMax];
   float FatJetInfo_Jet_SD_chi[nFjMax];
   float FatJetInfo_Jet_pt[nFjMax];
-  int FatJetInfo_Jet_SD_nMicrojets[nFjMax];
   int FatJetInfo_Jet_SD_nBtagMicrojets[nFjMax];
+
+  int   FatJetInfo_Jet_SD_nMicrojets[nFjMax];
   int FatJetInfo_Jet_SD_nFirstMicrojet[nFjMax];
   int FatJetInfo_Jet_SD_nLastMicrojet[nFjMax];
   float FatJetInfo_Jet_SD_Microjet_pt[nMjMax];
-  int FatJetInfo_Jet_SD_Microjet_isBtag[nMjMax];
+  float FatJetInfo_Jet_SD_Microjet_eta[nMjMax];
+  float FatJetInfo_Jet_SD_Microjet_phi[nMjMax];
+  int   FatJetInfo_Jet_SD_Microjet_isBtag[nMjMax];
+
+  int FatJetInfo_Jet_SV_multi[nFjMax];
+  int FatJetInfo_Jet_nFirstSV[nFjMax];
+  int FatJetInfo_Jet_nLastSV[nFjMax];
+  float FatJetInfo_SV_vtx_pt[nSVMax];
+  float FatJetInfo_SV_vtx_eta[nSVMax];
+  float FatJetInfo_SV_vtx_phi[nSVMax];
 
   t->SetBranchAddress("nGenPruned",&nGenPruned);
   t->SetBranchAddress("GenPruned_pdgID",&GenPruned_pdgID);
@@ -46,22 +60,52 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
   tf->SetBranchAddress("FatJetInfo.Jet_phi",&FatJetInfo_Jet_phi);
   tf->SetBranchAddress("FatJetInfo.Jet_SD_chi",&FatJetInfo_Jet_SD_chi);
   tf->SetBranchAddress("FatJetInfo.Jet_pt",&FatJetInfo_Jet_pt);
-  tf->SetBranchAddress("FatJetInfo.Jet_SD_nMicrojets",&FatJetInfo_Jet_SD_nMicrojets);
   tf->SetBranchAddress("FatJetInfo.Jet_SD_nBtagMicrojets",&FatJetInfo_Jet_SD_nBtagMicrojets);
+
+  tf->SetBranchAddress("FatJetInfo.Jet_SD_nMicrojets",&FatJetInfo_Jet_SD_nMicrojets);
   tf->SetBranchAddress("FatJetInfo.Jet_SD_nFirstMicrojet",&FatJetInfo_Jet_SD_nFirstMicrojet);
   tf->SetBranchAddress("FatJetInfo.Jet_SD_nLastMicrojet",&FatJetInfo_Jet_SD_nLastMicrojet);
   tf->SetBranchAddress("FatJetInfo.Jet_SD_Microjet_pt",&FatJetInfo_Jet_SD_Microjet_pt);
+  tf->SetBranchAddress("FatJetInfo.Jet_SD_Microjet_eta",&FatJetInfo_Jet_SD_Microjet_eta);
+  tf->SetBranchAddress("FatJetInfo.Jet_SD_Microjet_phi",&FatJetInfo_Jet_SD_Microjet_phi);
   tf->SetBranchAddress("FatJetInfo.Jet_SD_Microjet_isBtag",&FatJetInfo_Jet_SD_Microjet_isBtag);
 
+  tf->SetBranchAddress("FatJetInfo.Jet_SV_multi",&FatJetInfo_Jet_SV_multi);
+  tf->SetBranchAddress("FatJetInfo.Jet_nFirstSV",&FatJetInfo_Jet_nFirstSV);
+  tf->SetBranchAddress("FatJetInfo.Jet_nLastSV",&FatJetInfo_Jet_nLastSV);
+  tf->SetBranchAddress("FatJetInfo.SV_vtx_pt",&FatJetInfo_SV_vtx_pt);
+  tf->SetBranchAddress("FatJetInfo.SV_vtx_eta",&FatJetInfo_SV_vtx_eta);
+  tf->SetBranchAddress("FatJetInfo.SV_vtx_phi",&FatJetInfo_SV_vtx_phi);
+
   float dR_match;
+  float gen_pt;
+
   float Fj_chi;
   float Fj_pt;
-  float gen_pt;
-  int Fj_nMj;
+
   int Fj_nBtagMj;
+  int Fj_nMj;
   const int MjPerFjMax = 10;
   float Mj_pt[MjPerFjMax];
+
+  float Mj_eta[MjPerFjMax];
+  float Mj_phi[MjPerFjMax];
   int Mj_isBtag[MjPerFjMax];
+
+  int nMj_gen = 2; //2 b's
+  const int nMjGenMax = 10;
+  float Mj_gen_pt[nMjGenMax];
+
+  const int nMatchMjPerFjMax = 50;
+  float dR_match_Mj[nMatchMjPerFjMax];
+  float Mj_match_pt[nMatchMjPerFjMax];
+  float Mj_match_gen_pt[nMatchMjPerFjMax];
+
+  int Fj_nSV;
+  const int SVPerFjMax = 20;
+  float SV_pt[SVPerFjMax];
+  float SV_eta[SVPerFjMax];
+  float SV_phi[SVPerFjMax];
 
   cout<<"Creating new root file containing Fatjet based tree: "<< fdir+"/"+"fMatch_"+fname+"_"+postfix+".root" << endl;
   TFile *fMatch = new TFile((fdir+"/"+"fMatch_"+fname+"_"+postfix+".root").c_str(),"RECREATE"); //DIFFERENCE BETWEEN USING POINTER???
@@ -73,7 +117,20 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
   tr_new->Branch("Fj_nMj",&Fj_nMj,"Fj_nMj/I");
   tr_new->Branch("Fj_nBtagMj",&Fj_nBtagMj,"Fj_nBtagMj/I");
   tr_new->Branch("Mj_pt",&Mj_pt,"Mj_pt[Fj_nMj]/F");
+  tr_new->Branch("Mj_eta",&Mj_eta,"Mj_eta[Fj_nMj]/F");
+  tr_new->Branch("Mj_phi",&Mj_phi,"Mj_phi[Fj_nMj]/F");
   tr_new->Branch("Mj_isBtag",&Mj_isBtag,"Mj_isBtag[Fj_nMj]/I");
+
+  tr_new->Branch("Mj_gen_pt",&Mj_gen_pt,"Mj_gen_pt[2]/F");
+
+  //tr_new->Branch("Mj_nMatch",&Mj_gen_pt,"Mj_nMatch/I");
+  tr_new->Branch("Mj_match_gen_pt",&Mj_gen_pt,"Mj_match_gen_pt[20]/F");
+  tr_new->Branch("Mj_match_pt",&Mj_pt,"Mj_matched_pt[20]/F");
+
+  tr_new->Branch("Fj_nSV",&Fj_nMj,"Fj_nSV/I");
+  tr_new->Branch("SV_pt",&SV_eta,"SV_pt[Fj_nSV]/F");
+  tr_new->Branch("SV_eta",&SV_eta,"SV_eta[Fj_nSV]/F");
+  tr_new->Branch("SV_phi",&SV_phi,"SV_phi[Fj_nSV]/F");
 
   cout << endl;
   cout << "Matching fatjets in "<< fname << ", with pdgid = " << gen_pdgid << endl;
@@ -81,16 +138,18 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
 
   //loop over events
   if(display)cout << endl;
-  for (int i =0 ; i<nEvent;i++){
+  //for (int i =0 ; i<nEvent;i++){
+  for (int i =0 ; i<3;i++){
     t->GetEntry(i);
     tf->GetEntry(i);
     if(display)cout << endl;
-    if(display)cout << "============  entry : "<< i << ", nGenPruned = "<< nGenPruned << ", nFatJet = "<< FatJetInfo_nJet <<"=============="<< endl;
-    if(display)cout << endl;
+    if(display)cout << "============  entry : "<< i << ", nGenPruned = "<< nGenPruned << ", nFatJet = "<< FatJetInfo_nJet <<"  =============="<< endl;
+    //    if(display)cout << endl;
 
     //loop over fatjets
     int nMatch=0;
     for(int j=0; j < FatJetInfo_nJet; j++){
+      if(display)cout<<endl;
       if(display)cout<< "Fatjet no. "<< j << " : Fatjet_eta = " << FatJetInfo_Jet_eta[j] << endl;
       if(display)cout<< "           "<<     "    Fatjet_phi = " << FatJetInfo_Jet_phi[j] << endl;
       if(display)cout<< "           "<<     "    Fatjet_chi = " << FatJetInfo_Jet_SD_chi[j] << endl;
@@ -98,42 +157,75 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
 
       //loop over GenPruned
       for(int k=2; k < nGenPruned; k++){
-	if(GenPruned_pdgID[k]==gen_pdgid){
-	  if(display)cout<< "        GenPruned no. "<< k << " : GenPruned_pdgID = " << GenPruned_pdgID[k] << endl;
-	  if(display)cout<< "                      "<<     "    GenPruned_eta = " << GenPruned_eta[k] << endl;
-	  if(display)cout<< "                      "<<     "    GenPruned_phi = " << GenPruned_phi[k] << endl;
+	if(GenPruned_pdgID[k]!=gen_pdgid) continue;
+	if(display)cout<< "        GenPruned no. "<< k << " : GenPruned_pdgID = " << GenPruned_pdgID[k] << endl;
+	if(display)cout<< "                      "<<     "    GenPruned_eta = " << GenPruned_eta[k] << endl;
+	if(display)cout<< "                      "<<     "    GenPruned_phi = " << GenPruned_phi[k] << endl;
 
-	  double dR = deltaR(GenPruned_eta[k], GenPruned_phi[k], FatJetInfo_Jet_eta[j], FatJetInfo_Jet_phi[j]);
-	  if(display)cout<< "        " << j<< "-"<<k<<", -------------------------------->  delta R = "<< dR ;// << endl;
-	  if(dR<dRmax){
-	    if(display)cout<<"----> MATCH!! " << endl;
-	    nMatch++;
-	    //----Determine Cuts conditions---- sync with postfix !!!
-	    //if(GenPruned_pT[k]<=200)continue;
-	    //if(FatJetInfo_Jet_SD_chi[j]<=0){
-	    //if(FatJetInfo_Jet_SD_chi[j]>0){
-	    //if(FatJetInfo_Jet_SD_chi[j]>0 && FatJetInfo_Jet_pt[j]>200){
+	double dR = deltaR(GenPruned_eta[k], GenPruned_phi[k], FatJetInfo_Jet_eta[j], FatJetInfo_Jet_phi[j]);
+	if(display)cout<< "        " << j<< "-"<<k<<", -------------------------------->  delta R = "<< dR ;// << endl;
+	if(dR<dRmax){
+	  if(display)cout<<"----> Fj-parton MATCH!! " << endl;
+	  nMatch++;
 
-	      dR_match = dR;
-	      Fj_chi = FatJetInfo_Jet_SD_chi[j];
-	      gen_pt = GenPruned_pT[k];
-	      Fj_pt = FatJetInfo_Jet_pt[j];
-	      Fj_nMj = FatJetInfo_Jet_SD_nMicrojets[j];
-	      Fj_nBtagMj = FatJetInfo_Jet_SD_nBtagMicrojets[j];
 
-	      int iMj = 0;
-	      for(int l=FatJetInfo_Jet_SD_nFirstMicrojet[j]; l < FatJetInfo_Jet_SD_nLastMicrojet[j] ;l++){
-		Mj_pt[iMj] = FatJetInfo_Jet_SD_Microjet_pt[l];
-		Mj_isBtag[iMj] = FatJetInfo_Jet_SD_Microjet_isBtag[l];
-		iMj++;
-	      }
+	  dR_match = dR;
+	  Fj_chi = FatJetInfo_Jet_SD_chi[j];
+	  gen_pt = GenPruned_pT[k];
+	  Fj_pt = FatJetInfo_Jet_pt[j];
+	  Fj_nMj = FatJetInfo_Jet_SD_nMicrojets[j];
+	  Fj_nBtagMj = FatJetInfo_Jet_SD_nBtagMicrojets[j];
+	  Fj_nSV = FatJetInfo_Jet_SV_multi[j];
 
-	      tr_new->Fill();
+	  //loop over SV
+	  //int iSV = 0;
+	  //for(int
 
-	    //}
-	  }//end if dR requirement
-	}//end if pdgid
 
+	  if(display)cout << endl;
+	  if(display)cout << "                ---------------"<< " nMJet = "<< FatJetInfo_Jet_SD_nMicrojets[j] <<"  -----------"<< endl;
+	  if(display)cout << endl;
+	  //loop over Microjets
+	  int iMj = 0;
+	  for(int l = FatJetInfo_Jet_SD_nFirstMicrojet[j] ; l < FatJetInfo_Jet_SD_nLastMicrojet[j] ;l++){
+	    if(display)cout<<endl;
+	    if(display)cout<< "                Microjet no. "<< l  << " : Mjet_pt    = " << FatJetInfo_Jet_SD_Microjet_pt[l] << endl;
+	    if(display)cout<< "                           "<<     "      Mjet_eta    = " << FatJetInfo_Jet_SD_Microjet_eta[l] << endl;
+	    if(display)cout<< "                           "<<     "      Mjet_phi    = " << FatJetInfo_Jet_SD_Microjet_phi[l]  << endl;
+	    if(display)cout<< "                           "<<     "      Mjet_isBtag = " << FatJetInfo_Jet_SD_Microjet_isBtag[l]  << endl;
+	    if(display)cout<<endl;
+
+	    Mj_pt[iMj] = FatJetInfo_Jet_SD_Microjet_pt[l];
+	    Mj_eta[iMj] = FatJetInfo_Jet_SD_Microjet_eta[l];
+	    Mj_phi[iMj] = FatJetInfo_Jet_SD_Microjet_phi[l];
+	    Mj_isBtag[iMj] = FatJetInfo_Jet_SD_Microjet_isBtag[l];
+	    iMj++;
+
+	    //Microjet matching loop
+	    int iMatchMj = 0;
+	    for(int iGenMj=0; iGenMj < nGenPruned; iGenMj++){
+	      if(GenPruned_pdgID[iGenMj]!=5) continue;//b quark
+	      Mj_gen_pt[iMatchMj] = GenPruned_pT[iGenMj];
+
+	      if(display)cout<< "                GenPruned no. "<< iGenMj << " : GenPruned_pdgID = " << GenPruned_pdgID[iGenMj] << endl;
+	      double dR_Mj = deltaR(GenPruned_eta[iGenMj], GenPruned_phi[iGenMj], FatJetInfo_Jet_SD_Microjet_eta[l], FatJetInfo_Jet_SD_Microjet_phi[l]);
+	      if(display)cout<< "                " << l<< "-"<<iGenMj<<", -------------------------------->  delta R = "<< dR_Mj ;// << endl;
+	      if(dR_Mj<MjCone){
+		if(display)cout<<"----> b quark MATCH!! ";
+		dR_match_Mj[iGenMj];
+		Mj_match_gen_pt[iMatchMj] = GenPruned_pT[iGenMj];
+		Mj_match_pt[iMatchMj] = Mj_pt[iMj] = FatJetInfo_Jet_SD_Microjet_pt[l];
+		iMatchMj++;
+	      }// end if dR_Mj
+	      if(display)cout << endl;
+
+	    }//end if Mj match loop
+
+	  }//Mj loop
+
+	  tr_new->Fill();
+
+	}//end if dR requirement
 	if(display)cout << endl;
 
       }//end GenPruned loop
@@ -204,7 +296,7 @@ TH2D* PartonMatch_2D(TFile* f, std::string yvar, double xbin, double xmin, doubl
 TH1D* PartonMatch_1D(std::string dir, TFile* f, std::string fname,  std::string var, std::string cut,  double xbin, double xmin, double xmax, std::string xlabel, std::string postfix, Color_t color = kBlue, int linestyle = 1,bool save = false){
 
   string var_ = var;
-  if(var_=="log(Fj_chi)") string var_ = "logChi"; //log(Fj_chi) become log( for some reason???
+  if(var_=="log(Fj_chi)") var_ = "logChi"; //log(Fj_chi) become log( for some reason???
 
   TCanvas* cvs = new TCanvas((var_+cut+postfix).c_str(),(var_+cut+postfix).c_str(),800,600);
 
@@ -241,12 +333,15 @@ double deltaR(double eta1, double phi1, double eta2, double phi2){
 
 void PartonMatch(bool display = false){
   string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
-  string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_HiggsWin20_mc_subjets";
-  string fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_HiggsWin20_mc_subjets";
+  string deltaHiggsMass = "HiggsWin10";
+  string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
+  string fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
   double dRmax = 1.2;
-  string postfix= "dRmax12_NoGenPtCut_NoFjPtCut_AllChi";
-  int sig_l = PartonMatch(dir,fsig,25,dRmax,display,postfix);
-  int bkg_l = PartonMatch(dir,fbkg,6,dRmax,display,postfix);
+  double MjCone = 0.15;
+  //string postfix= "dRmax12_NoGenPtCut_NoFjPtCut_AllChi";
+  string postfix= "TEMP";
+  int sig_l = PartonMatch(dir,fsig,25,dRmax,MjCone,display,postfix);
+  int bkg_l = PartonMatch(dir,fbkg,6,dRmax,MjCone,display,postfix);
 }
 
 void makeHistos(bool save = false, bool display = false){
