@@ -6,6 +6,7 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
   TFile *f = new TFile((fdir+"/"+fname+".root").c_str());
 
   TDirectoryFile *d = f->GetDirectory("btagana");
+  //TDirectoryFile *d = f->GetDirectory("btaganaSubjets");
   TTree *t = d->Get("ttree");
   TDirectoryFile *df = f->GetDirectory("btaganaSubJets");
   TTree *tf = df->Get("ttree");
@@ -21,7 +22,6 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
   float GenPruned_eta[nGenPrunedMax];
   float GenPruned_phi[nGenPrunedMax];
   float GenPruned_pT[nGenPrunedMax];
-
 
   const int nFjMax=5;
   const int nMjMax=50;
@@ -94,9 +94,12 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
   int Mj_isBtag[MjPerFjMax];
   float Mj_dR[MjPerFjMax];
   int Mj_dR_genIdx[MjPerFjMax];
+  int Mj_gen_matched_pdgID[MjPerFjMax];
+  float Mj_gen_matched_pt[MjPerFjMax];
 
-  int nMj_gen = 4; //4 b's
-  const int nMjGenMax = 10;
+
+  int nMj_gen = 30; //4 b's
+  const int nMjGenMax = 30;
   float Mj_gen_pt[nMjGenMax];
   int Mj_gen_pdgID[nMjGenMax];
   int Mj_gen_isMatch[nMjGenMax];
@@ -129,10 +132,12 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
   tr_new->Branch("Mj_isBtag",&Mj_isBtag,"Mj_isBtag[Fj_nMj]/I");
   tr_new->Branch("Mj_dR",&Mj_dR,"Mj_dR[Fj_nMj]/F");
   tr_new->Branch("Mj_dR_genIdx",&Mj_dR_genIdx,"Mj_dR_genIdx[Fj_nMj]/I");
+  tr_new->Branch("Mj_gen_matched_pdgID",&Mj_gen_matched_pdgID,"Mj_gen_matched_pdgID[Fj_nMj]/I");
+  tr_new->Branch("Mj_gen_matched_pt",&Mj_gen_matched_pt,"Mj_gen_matched_pt[Fj_nMj]/F");
 
-  tr_new->Branch("Mj_gen_pt",&Mj_gen_pt,"Mj_gen_pt[4]/F");
-  tr_new->Branch("Mj_gen_pdgID",&Mj_gen_pdgID,"Mj_gen_pdgID[4]/I");
-  tr_new->Branch("Mj_gen_isMatch",&Mj_gen_isMatch,"Mj_gen_isMatch[4]/I");
+  tr_new->Branch("Mj_gen_pt",&Mj_gen_pt,"Mj_gen_pt[30]/F");
+  tr_new->Branch("Mj_gen_pdgID",&Mj_gen_pdgID,"Mj_gen_pdgID[30]/I");
+  tr_new->Branch("Mj_gen_isMatch",&Mj_gen_isMatch,"Mj_gen_isMatch[30]/I");
 
   tr_new->Branch("Mj_nMatch",&Mj_nMatch,"Mj_nMatch/I");
 
@@ -148,7 +153,7 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
   //loop over events
   if(display)cout << endl;
   for (int i =0 ; i<nEvent;i++){
-  //for (int i =0 ; i<10;i++){
+  //for (int i =0 ; i<3;i++){
     t->GetEntry(i);
     tf->GetEntry(i);
     if(display)cout << endl;
@@ -189,9 +194,9 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
 	  Fj_nBtagMj = FatJetInfo_Jet_SD_nBtagMicrojets[j];
 	  Fj_nSV = FatJetInfo_Jet_SV_multi[j];
 
-	  for(int ib_ =0; ib_<4;ib_++)Mj_gen_isMatch[ib_]=0; //initialize recon status of b quarks
-	  for(int ib_ =0; ib_<4;ib_++)Mj_gen_pt[ib_]=-9999; //initialize pt of b quarks
-	  for(int ib_ =0; ib_<4;ib_++)Mj_gen_pdgID[ib_]=-9999; //initialize pt of b quarks
+	  for(int ib_ =0; ib_<nMjGenMax;ib_++)Mj_gen_isMatch[ib_]=0; //initialize recon status of b quarks
+	  for(int ib_ =0; ib_<nMjGenMax;ib_++)Mj_gen_pt[ib_]=-9999; //initialize pt of b quarks
+	  for(int ib_ =0; ib_<nMjGenMax;ib_++)Mj_gen_pdgID[ib_]=-9999; //initialize pt of b quarks
 
 	  //loop over SV
 	  int iSV = 0; int first; int last;
@@ -225,13 +230,17 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
 	    Mj_eta[iMj] = FatJetInfo_Jet_SD_Microjet_eta[l];
 	    Mj_phi[iMj] = FatJetInfo_Jet_SD_Microjet_phi[l];
 	    Mj_isBtag[iMj] = FatJetInfo_Jet_SD_Microjet_isBtag[l];
-	    Mj_dR[iMj] = -9999;
-	    Mj_dR_genIdx[iMj] = -9999;
+	    Mj_dR[iMj] = -99999;
+	    Mj_dR_genIdx[iMj] = -99999;
+	    Mj_gen_matched_pdgID[iMj] = -99999;
+	    Mj_gen_matched_pt[iMj] = -99999;
 
 	    //Gen Mj matching loop
 	    int ib = 0;
 	    for(int iGenMj=2; iGenMj < nGenPruned; iGenMj++){
-	      if(abs(GenPruned_pdgID[iGenMj])!=5) continue;//b quark
+	      //if(abs(GenPruned_pdgID[iGenMj])!=5) continue;//b quark
+	      if(abs(GenPruned_pdgID[iGenMj])==gen_pdgid) continue; // dont match with fatjet gen
+	      //if(GenPruned_pdgID[iGenMj]==35) continue;
 	      Mj_gen_pt[ib] = GenPruned_pT[iGenMj];
 	      Mj_gen_pdgID[ib] = GenPruned_pdgID[iGenMj];
 
@@ -242,9 +251,12 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
 
 	      //matching dR requirement
 	      if(dR_Mj<MjCone){
-		if(display)cout<<"----> b quark MATCH!! ";
+		if(display)cout<<"----> Mj-Parton MATCH!! ";
+		if(abs(Mj_dR[iMj])<dR_Mj) continue; //TO MAKE SURE THIS RECORDS THE SMALLEST deltaR!!
 		Mj_dR[iMj] = dR_Mj;
 		Mj_dR_genIdx[iMj] = ib;
+		Mj_gen_matched_pdgID[iMj] = GenPruned_pdgID[iGenMj];
+		Mj_gen_matched_pt[iMj] = GenPruned_pT[iGenMj];
 		Mj_gen_isMatch[ib] = 1;
 		iMatchMj++;
 	      }// end if dR_Mj
@@ -291,6 +303,39 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
 
 }
 
+void PartonMatch(bool display = false){
+  string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
+  string deltaHiggsMass;
+  string fsig;
+  string fbkg;
+  double dRmax = 1.2;
+  double MjCone = 0.15;
+  string postfix= "dRmax12_NoGenPtCut_NoFjPtCut_AllChi";
+
+  deltaHiggsMass = "HiggsWin10";
+  fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
+  fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
+  int sig_l = PartonMatch(dir,fsig,25,dRmax,MjCone,display,postfix);
+  int bkg_l = PartonMatch(dir,fbkg,6,dRmax,MjCone,display,postfix);
+
+  deltaHiggsMass = "HiggsWin20";
+  fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
+  fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
+  int sig_l = PartonMatch(dir,fsig,25,dRmax,MjCone,display,postfix);
+  int bkg_l = PartonMatch(dir,fbkg,6,dRmax,MjCone,display,postfix);
+}
+
+double deltaR(double eta1, double phi1, double eta2, double phi2){
+  double dEta = eta1 - eta2;
+
+  double dPhi = phi1 - phi2;
+  while (dPhi > TMath::Pi()) dPhi -= 2*TMath::Pi();
+  while (dPhi <= -TMath::Pi()) dPhi += 2*TMath::Pi();
+
+  double dR = sqrt(dEta*dEta + dPhi*dPhi);
+  return dR;
+}
+
 TH2D* PartonMatch_2D(TFile* f, std::string yvar, double xbin, double xmin, double xmax, double ybin, double ymin, double ymax,std::string postfix){
 
   //TFile *f = new TFile((dir+"/"+"fMatch_"+fname+"_"+postfix+".root").c_str()); //must match fMatch name
@@ -327,6 +372,7 @@ TH2D* PartonMatch_2D(TFile* f, std::string yvar, double xbin, double xmin, doubl
   return h2;
 }
 
+
 TH1D* PartonMatch_1D(std::string dir, TFile* f, std::string fname,  std::string var, std::string cut,  double xbin, double xmin, double xmax, std::string xlabel, std::string postfix, Color_t color = kBlue, int linestyle = 1,bool save = false){
 
   string var_ = var;
@@ -352,39 +398,6 @@ TH1D* PartonMatch_1D(std::string dir, TFile* f, std::string fname,  std::string 
   if(save)cvs->SaveAs((dir+"/"+fname+"_"+var_+"_"+cut+".eps").c_str());
 
   return h;
-}
-
-double deltaR(double eta1, double phi1, double eta2, double phi2){
-  double dEta = eta1 - eta2;
-
-  double dPhi = phi1 - phi2;
-  while (dPhi > TMath::Pi()) dPhi -= 2*TMath::Pi();
-  while (dPhi <= -TMath::Pi()) dPhi += 2*TMath::Pi();
-
-  double dR = sqrt(dEta*dEta + dPhi*dPhi);
-  return dR;
-}
-
-void PartonMatch(bool display = false){
-  string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
-  string deltaHiggsMass;
-  string fsig;
-  string fbkg;
-  double dRmax = 1.2;
-  double MjCone = 0.15;
-  string postfix= "dRmax12_NoGenPtCut_NoFjPtCut_AllChi";
-
-  deltaHiggsMass = "HiggsWin10";
-  fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
-  fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
-  int sig_l = PartonMatch(dir,fsig,25,dRmax,MjCone,display,postfix);
-  int bkg_l = PartonMatch(dir,fbkg,6,dRmax,MjCone,display,postfix);
-
-  deltaHiggsMass = "HiggsWin20";
-  fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
-  fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
-  int sig_l = PartonMatch(dir,fsig,25,dRmax,MjCone,display,postfix);
-  int bkg_l = PartonMatch(dir,fbkg,6,dRmax,MjCone,display,postfix);
 }
 
 void makeHistos(bool save = false, bool display = false){
@@ -1031,7 +1044,7 @@ void makeHistos_sig_bkg_2plots(std::string dir, std::string fsig, std::string fb
 
 void Alakazam(){
   string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
-  string deltaHiggsMass = "HiggsWin10";
+  string deltaHiggsMass = "HiggsWin20";
   string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
   string fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
 
@@ -1039,14 +1052,18 @@ void Alakazam(){
 
   double xbin = 50; double xmin = 0; double xmax = 1000;
   bool save = true;
-  makeHistos_Fj_gen_pt_2plots(save, dir, fsig, "", xbin, xmin, xmax, postfix);
-  makeHistos_Fj_gen_pt_2plots(save, dir, fsig, "Fj_chi>0", xbin, xmin, xmax, postfix);
-  makeHistos_Fj_gen_pt_2plots(save, dir, fsig, "Fj_chi<=0", xbin, xmin, xmax, postfix);
+  //makeHistos_Fj_gen_pt_2plots(save, dir, fsig, "", xbin, xmin, xmax, postfix);
+  //makeHistos_Fj_gen_pt_2plots(save, dir, fsig, "Fj_chi>0", xbin, xmin, xmax, postfix);
+  //makeHistos_Fj_gen_pt_2plots(save, dir, fsig, "Fj_chi<=0", xbin, xmin, xmax, postfix);
+
+  makeHistos_Fj_gen_pt_2plots(save, dir, fbkg, "", xbin, xmin, xmax, postfix);
+  makeHistos_Fj_gen_pt_2plots(save, dir, fbkg, "Fj_chi>0", xbin, xmin, xmax, postfix);
+  makeHistos_Fj_gen_pt_2plots(save, dir, fbkg, "Fj_chi<=0", xbin, xmin, xmax, postfix);
 
   string var = "log(Fj_chi)" ; string xlabel = "Log(#chi)";
   double xbin = 50; double xmin = -22; double xmax = -2;
   bool save = true;
-  makeHistos_sig_bkg_2plots(dir,fsig,fbkg,var,"Fj_chi>0",xbin,xmin,xmax,xlabel,save);
+  //makeHistos_sig_bkg_2plots(dir,fsig,fbkg,var,"Fj_chi>0",xbin,xmin,xmax,xlabel,save);
 
 
   /*
