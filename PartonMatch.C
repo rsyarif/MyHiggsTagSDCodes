@@ -79,7 +79,9 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
 
   float dR_match;
   float gen_pt;
+  int gen_pdgID;
 
+  int Fj_event_idx;
   float Fj_chi;
   float Fj_pt;
 
@@ -87,15 +89,16 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
   int Fj_nMj;
   const int MjPerFjMax = 10;
   float Mj_pt[MjPerFjMax];
-
   float Mj_eta[MjPerFjMax];
   float Mj_phi[MjPerFjMax];
   int Mj_isBtag[MjPerFjMax];
   float Mj_dR[MjPerFjMax];
+  int Mj_dR_genIdx[MjPerFjMax];
 
   int nMj_gen = 4; //4 b's
   const int nMjGenMax = 10;
   float Mj_gen_pt[nMjGenMax];
+  int Mj_gen_pdgID[nMjGenMax];
   int Mj_gen_isMatch[nMjGenMax];
 
   const int nMatchMjPerFjMax = 50;
@@ -108,13 +111,16 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
   float SV_eta[SVPerFjMax];
   float SV_phi[SVPerFjMax];
 
+  cout<<endl;
   cout<<"Creating new root file containing Fatjet based tree: "<< fdir+"/"+"fMatch_"+fname+"_"+postfix+".root" << endl;
   TFile *fMatch = new TFile((fdir+"/"+"fMatch_"+fname+"_"+postfix+".root").c_str(),"RECREATE"); //DIFFERENCE BETWEEN USING POINTER???
   TTree *tr_new = new TTree("tree","tree");
+  tr_new->Branch("Fj_event_idx",&Fj_event_idx,"Fj_event_idx/I");
   tr_new->Branch("dR_match",&dR_match,"dR_match/F");
   tr_new->Branch("Fj_chi",&Fj_chi,"Fj_chi/F");
   tr_new->Branch("Fj_pt",&Fj_pt,"Fj_pt/F");
   tr_new->Branch("gen_pt",&gen_pt,"gen_pt/F");
+  tr_new->Branch("gen_pdgID",&gen_pdgID,"gen_pdgID/I");
   tr_new->Branch("Fj_nMj",&Fj_nMj,"Fj_nMj/I");
   tr_new->Branch("Fj_nBtagMj",&Fj_nBtagMj,"Fj_nBtagMj/I");
   tr_new->Branch("Mj_pt",&Mj_pt,"Mj_pt[Fj_nMj]/F");
@@ -122,8 +128,10 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
   tr_new->Branch("Mj_phi",&Mj_phi,"Mj_phi[Fj_nMj]/F");
   tr_new->Branch("Mj_isBtag",&Mj_isBtag,"Mj_isBtag[Fj_nMj]/I");
   tr_new->Branch("Mj_dR",&Mj_dR,"Mj_dR[Fj_nMj]/F");
+  tr_new->Branch("Mj_dR_genIdx",&Mj_dR_genIdx,"Mj_dR_genIdx[Fj_nMj]/I");
 
   tr_new->Branch("Mj_gen_pt",&Mj_gen_pt,"Mj_gen_pt[4]/F");
+  tr_new->Branch("Mj_gen_pdgID",&Mj_gen_pdgID,"Mj_gen_pdgID[4]/I");
   tr_new->Branch("Mj_gen_isMatch",&Mj_gen_isMatch,"Mj_gen_isMatch[4]/I");
 
   tr_new->Branch("Mj_nMatch",&Mj_nMatch,"Mj_nMatch/I");
@@ -140,7 +148,7 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
   //loop over events
   if(display)cout << endl;
   for (int i =0 ; i<nEvent;i++){
-  //for (int i =0 ; i<3;i++){
+  //for (int i =0 ; i<10;i++){
     t->GetEntry(i);
     tf->GetEntry(i);
     if(display)cout << endl;
@@ -172,14 +180,18 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
 	  nMatch++;
 
 	  dR_match = dR;
+	  Fj_event_idx = i;
 	  Fj_chi = FatJetInfo_Jet_SD_chi[j];
 	  gen_pt = GenPruned_pT[k];
+	  gen_pdgID = GenPruned_pdgID[k];
 	  Fj_pt = FatJetInfo_Jet_pt[j];
 	  Fj_nMj = FatJetInfo_Jet_SD_nMicrojets[j];
 	  Fj_nBtagMj = FatJetInfo_Jet_SD_nBtagMicrojets[j];
 	  Fj_nSV = FatJetInfo_Jet_SV_multi[j];
 
 	  for(int ib_ =0; ib_<4;ib_++)Mj_gen_isMatch[ib_]=0; //initialize recon status of b quarks
+	  for(int ib_ =0; ib_<4;ib_++)Mj_gen_pt[ib_]=-9999; //initialize pt of b quarks
+	  for(int ib_ =0; ib_<4;ib_++)Mj_gen_pdgID[ib_]=-9999; //initialize pt of b quarks
 
 	  //loop over SV
 	  int iSV = 0; int first; int last;
@@ -213,13 +225,15 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
 	    Mj_eta[iMj] = FatJetInfo_Jet_SD_Microjet_eta[l];
 	    Mj_phi[iMj] = FatJetInfo_Jet_SD_Microjet_phi[l];
 	    Mj_isBtag[iMj] = FatJetInfo_Jet_SD_Microjet_isBtag[l];
-	    Mj_dR[iMj] = 9999;
+	    Mj_dR[iMj] = -9999;
+	    Mj_dR_genIdx[iMj] = -9999;
+
 	    //Gen Mj matching loop
 	    int ib = 0;
 	    for(int iGenMj=2; iGenMj < nGenPruned; iGenMj++){
 	      if(abs(GenPruned_pdgID[iGenMj])!=5) continue;//b quark
 	      Mj_gen_pt[ib] = GenPruned_pT[iGenMj];
-
+	      Mj_gen_pdgID[ib] = GenPruned_pdgID[iGenMj];
 
 	      if(display)cout<< "                             GenPruned no. "<< iGenMj << " : GenPruned_pdgID = " << GenPruned_pdgID[iGenMj] << endl;
 	      if(display)cout<< "                                           "<< iGenMj << " : GenPruned_pT = " << GenPruned_pT[iGenMj] << endl;
@@ -230,6 +244,7 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
 	      if(dR_Mj<MjCone){
 		if(display)cout<<"----> b quark MATCH!! ";
 		Mj_dR[iMj] = dR_Mj;
+		Mj_dR_genIdx[iMj] = ib;
 		Mj_gen_isMatch[ib] = 1;
 		iMatchMj++;
 	      }// end if dR_Mj
@@ -352,13 +367,22 @@ double deltaR(double eta1, double phi1, double eta2, double phi2){
 
 void PartonMatch(bool display = false){
   string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
-  string deltaHiggsMass = "HiggsWin20";
-  string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
-  string fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
+  string deltaHiggsMass;
+  string fsig;
+  string fbkg;
   double dRmax = 1.2;
   double MjCone = 0.15;
-  //string postfix= "dRmax12_NoGenPtCut_NoFjPtCut_AllChi";
   string postfix= "dRmax12_NoGenPtCut_NoFjPtCut_AllChi";
+
+  deltaHiggsMass = "HiggsWin10";
+  fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
+  fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
+  int sig_l = PartonMatch(dir,fsig,25,dRmax,MjCone,display,postfix);
+  int bkg_l = PartonMatch(dir,fbkg,6,dRmax,MjCone,display,postfix);
+
+  deltaHiggsMass = "HiggsWin20";
+  fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
+  fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
   int sig_l = PartonMatch(dir,fsig,25,dRmax,MjCone,display,postfix);
   int bkg_l = PartonMatch(dir,fbkg,6,dRmax,MjCone,display,postfix);
 }
