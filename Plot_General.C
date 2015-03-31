@@ -58,8 +58,14 @@ void Plot_General_sig_bkg(bool save = false, std::string dir, std::string fsig, 
 
   h1->SetTitle("");
 
-  h1->Draw();
-  h2->Draw("SAMES");
+  if(h1->GetMaximum()>h2->GetMaximum()){
+    h1->Draw();
+    h2->Draw("SAMES");
+  }
+  else{
+    h2->Draw();
+    h1->Draw("SAMES");
+  }
 
   leg = new TLegend(0.6,0.65,0.8,0.85);
   leg->SetFillStyle(0);
@@ -166,8 +172,14 @@ void Plot_General_fj_gen(bool save = false,std::string dir, std::string fsig, st
 
   h1->SetTitle("");
 
-  h2->Draw();
-  h1->Draw("SAME");
+  if(h1->GetMaximum()>h2->GetMaximum()){
+    h1->Draw();
+    h2->Draw("SAME");
+  }
+  else{
+    h2->Draw();
+    h1->Draw("SAME");
+  }
 
   leg = new TLegend(0.6,0.65,0.8,0.85);
   leg->SetFillStyle(0);
@@ -200,26 +212,38 @@ void Plot_General_fj_gen(bool save = false,std::string dir, std::string fsig, st
 }
 
 void Alakazam(){
+  string dir ="rootfiles";
+  string deltaHiggsMass;
+  string fsig;
+  string fbkg;
+  double dRmax = 0.8;
+  double MjCone = 0.15;
+  string postfix= "dRmax08_NoGenPtCut_NoFjPtCut_AllChi";
 
-  std::string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
-  std::string fsig ="RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_HiggsWin20_mc_subjets";
-  std::string fbkg ="ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_HiggsWin20_mc_subjets";
+  deltaHiggsMass = "HiggsWin20";
+  fsig = "Rad_HHto4b_M800_13TeV_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
+  fbkg = "TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
 
   std::string rdir = "btaganaSubJets";
-  std::string rdir_gen = "btagana";
+  std::string rdir_gen = "btaganaSubJets";
 
   std::string cut = "FatJetInfo.nJet>0";
+  std::string SDcut = "&&FatJetInfo.Jet_SD_chi>0";
 
   std::string var = "log(FatJetInfo.Jet_SD_chi)"; std::string var_ = "LogChi";
-  Plot_General_sig_bkg(true, dir, fsig, fbkg, rdir, var, var_, cut, 50,-22,-2,"Log(#chi)","");
+  Plot_General_sig_bkg(true, dir, fsig, fbkg, rdir, var, var_, cut+SDcut, 50,-22,-2,"Log(#chi)","");
   std::string var = "FatJetInfo.Jet_pt"; std::string var_ = "pt";
   Plot_General_sig_bkg(true, dir, fsig, fbkg, rdir, var, var_, cut, 50,0,1000,"p_{T}","");
 
   std::string var = "FatJetInfo.Jet_pt";
   std::string var_gen = "GenPruned_pT";
   std::string var_label = "pt";
+
   std::string cut_gen = "GenPruned_pdgID==25";
   Plot_General_fj_gen(true, dir, fsig, rdir, rdir_gen, var, var_gen, var_label, cut, cut_gen, 50,0,1000,"p_{T}","");
+
+  std::string cut_gen = "GenPruned_pdgID==6";
+  Plot_General_fj_gen(true, dir, fbkg, rdir, rdir_gen, var, var_gen, var_label, cut, cut_gen, 50,0,1000,"p_{T}","");
 }
 
 
