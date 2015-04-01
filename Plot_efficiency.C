@@ -458,7 +458,7 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
   string fsig;  string fsig2;
   string fbkg;  string fbkg2;
   string postfix = "dRmax08_NoGenPtCut_NoFjPtCut_AllChi";
-  double xbin = 40; double xmin = -18; double xmax = -2;
+  double xbin = 50; double xmin = -22; double xmax = -2;
   bool save = false;
   string var = "log(Fj_chi)" ; string xlabel = "Log(#chi)";
   string cut = "Fj_chi>0";
@@ -470,7 +470,6 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
 
   deltaHiggsMass = "HiggsWin10";
   fsig = "Rad_HHto4b_M800_13TeV_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
-  //fbkg = "TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
   fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_"+deltaHiggsMass+"_mc_subjets";
   TFile *fs = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
   TFile *fb = new TFile((dir+"/"+"fMatch_"+fbkg+"_"+postfix+".root").c_str());
@@ -480,7 +479,6 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
 
   deltaHiggsMass = "HiggsWin20";
   fsig2 = "Rad_HHto4b_M800_13TeV_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
-  //fbkg2 = "TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
   fbkg2 = "ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_"+deltaHiggsMass+"_mc_subjets";
   TFile *fs2 = new TFile((dir+"/"+"fMatch_"+fsig2+"_"+postfix+".root").c_str());
   TFile *fb2 = new TFile((dir+"/"+"fMatch_"+fbkg2+"_"+postfix+".root").c_str());
@@ -498,8 +496,6 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
 
   int sig_t_nbins = h_sig_t->GetSize()-2;
   int bkg_t_nbins = h_bkg_t->GetSize()-2;
-  //double Ssig_t = h_sig_t->Integral(0,sig_t_nbins+1);
-  //double Sbkg_t = h_bkg_t->Integral(0,bkg_t_nbins+1);
   double sig_t_integral[sig_t_nbins];
   double bkg_t_integral[bkg_t_nbins];
   double sig_t_eff[sig_t_nbins];
