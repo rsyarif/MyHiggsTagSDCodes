@@ -314,14 +314,16 @@ void PartonMatch(bool display = false){
 
   deltaHiggsMass = "HiggsWin10";
   fsig = "Rad_HHto4b_M800_13TeV_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
-  fbkg = "TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
+  //fbkg = "TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
+  fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_"+deltaHiggsMass+"_mc_subjets";
   //int sig_l = PartonMatch(dir,fsig,25,dRmax,MjCone,display,postfix);
   //int bkg_l = PartonMatch(dir,fbkg,6,dRmax,MjCone,display,postfix);
 
   deltaHiggsMass = "HiggsWin20";
   fsig = "Rad_HHto4b_M800_13TeV_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
-  fbkg = "TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
-  int sig_l = PartonMatch(dir,fsig,25,dRmax,MjCone,display,postfix);
+  //fbkg = "TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
+  fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_"+deltaHiggsMass+"_mc_subjets";
+  //int sig_l = PartonMatch(dir,fsig,25,dRmax,MjCone,display,postfix);
   int bkg_l = PartonMatch(dir,fbkg,6,dRmax,MjCone,display,postfix);
 }
 
@@ -336,39 +338,31 @@ double deltaR(double eta1, double phi1, double eta2, double phi2){
   return dR;
 }
 
-TH2D* PartonMatch_2D(TFile* f, std::string yvar, double xbin, double xmin, double xmax, double ybin, double ymin, double ymax,std::string postfix){
+//TH2D* PartonMatch_2D(TFile* f, std::string yvar, double xbin, double xmin, double xmax, double ybin, double ymin, double ymax,std::string postfix){
+TH2D* PartonMatch_2D(std::string dir, TFile* f, std::string fname,  std::string var1, std::string var2, std::string cut,  double xbin, double xmin, double xmax,double ybin, double ymin, double ymax, std::string xlabel,std::string ylabel, std::string DrawOption, std::string postfix,bool save = false){
 
-  //TFile *f = new TFile((dir+"/"+"fMatch_"+fname+"_"+postfix+".root").c_str()); //must match fMatch name
+  string var1_ = var1;
+  if(var1_=="log(Fj_chi)") var1_ = "logChi"; //log(Fj_chi) become log( for some reason???
+  string var2_ = var2;
+  if(var2_=="log(Fj_chi)") var2_ = "logChi"; //log(Fj_chi) become log( for some reason???
+
+  TCanvas* cvs = new TCanvas((var1_+var2_+cut+postfix).c_str(),(var1_+var2_+cut+postfix).c_str(),800,600);
+
   TTree *t = f->Get("tree");
+  TH2D* h2 = new TH2D((var1_+var2_+cut+postfix).c_str(),(var1_+var2_+cut+postfix).c_str(),xbin,xmin,xmax,ybin,ymin,ymax);
 
-  float dR_match;
-  float Fj_chi;
-  float Fj_pt;
-  float gen_pt;
-  int Fj_nBtagMj;
+  t->Draw((var1+":"+var2+">>"+var1_+var2_+cut+postfix).c_str(),cut.c_str());
 
-  t->SetBranchAddress("dR_match",&dR_match);
-  t->SetBranchAddress("Fj_chi",&Fj_chi);
-  t->SetBranchAddress("Fj_pt",&Fj_pt);
-  t->SetBranchAddress("gen_pt",&gen_pt);
-  t->SetBranchAddress("Fj_nBtagMj",&Fj_nBtagMj);
+  h2->GetXaxis()->SetTitle(xlabel.c_str());
+  h2->GetXaxis()->SetTitle(ylabel.c_str());
+  h2->SetTitle("");
 
-  TH2D* h2 = new TH2D("h2","h2",xbin,xmin,xmax,ybin,ymin,ymax);
-  for(int i=0;i<t->GetEntries();i++){
-    t->GetEntry(i);
-    if(yvar=="dR_match")h2->Fill(log(Fj_chi),dR_match);
-    else if(yvar=="Fj_pt")h2->Fill(log(Fj_chi),Fj_pt);
-    else if(yvar=="gen_pt")h2->Fill(log(Fj_chi),gen_pt);
-    else if(yvar=="Fj_nBtagMj")h2->Fill(log(Fj_chi),Fj_nBtagMj);
-    else{
-      cout<<"Invalid yvar value!"<<endl;
-      return 0;
-    }
-  }
-  h2->GetXaxis()->SetTitle("log(#chi)");
+  cvs->cd();
+  gStyle->SetOptStat("nemrous");
+  h2->Draw(DrawOption.c_str());
 
-  //f->Close();
   delete t;
+  if(save)cvs->SaveAs((dir+"/2D_"+fname+"_"+var1_+"_"+var2_+"_"+cut+".eps").c_str());
   return h2;
 }
 
@@ -1059,6 +1053,20 @@ void makeHistos_sig_bkg_2plots(std::string dir, std::string fsig, std::string fb
 
 }
 
+void makeHistos_2D(std::string dir, std::string fname,  std::string var1, std::string var2, std::string cut,  double xbin, double xmin, double xmax,double ybin, double ymin, double ymax, std::string xlabel,std::string ylabel, std::string DrawOption, std::string postfix,bool save = false){
+
+  TFile *f = new TFile((dir+"/"+"fMatch_"+fname+"_"+postfix+".root").c_str());
+  TH2D* h = PartonMatch_2D(dir,f,fname,var1,var2,cut,xbin,xmin,xmax,ybin,ymin,ymax,xlabel,ylabel,DrawOption,postfix,save);
+
+  //TCanvas* canvas = new TCanvas("2D","2D",800,600);
+
+  //canvas->cd();
+  //h->Draw(DrawOption.c_str());
+
+  //if(save)canvas->SaveAs((dir+"/2D_"+fname+"_"+var1_+"_"+var2_+"_"+cut+".eps").c_str());
+
+}
+
 void Alakazam(){
   string dir ="rootfiles";
   string deltaHiggsMass;
@@ -1074,7 +1082,9 @@ void Alakazam(){
 
   deltaHiggsMass = "HiggsWin20";
   fsig = "Rad_HHto4b_M800_13TeV_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
-  fbkg = "TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
+  //fbkg = "TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
+  fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_"+deltaHiggsMass+"_mc_subjets";
+
 
   //Fj vs Gen pt distribution
   xbin = 50;  xmin = 0;  xmax = 1000;
@@ -1089,11 +1099,13 @@ void Alakazam(){
   makeHistos_Fj_gen_pt_2plots(save, dir, fbkg, "Fj_chi>0", xbin, xmin, xmax, postfix);
   makeHistos_Fj_gen_pt_2plots(save, dir, fbkg, "Fj_chi<=0", xbin, xmin, xmax, postfix);
 
+
   //Sig vs Bkg
   var = "log(Fj_chi)" ;  xlabel = "Log(#chi)";
   xbin = 50;  xmin = -22;  xmax = -2;
   save = true;
   makeHistos_sig_bkg_2plots(dir,fsig,fbkg,var,"Fj_chi>0",xbin,xmin,xmax,xlabel,save);
+
 
   var = "Fj_nMj" ;  xlabel = "# of Microjets";
   xbin = 10;  xmin = -0.5;  xmax = 9.5;
@@ -1125,6 +1137,10 @@ void Alakazam(){
   makeHistos_sig_bkg_2plots(dir, fsig, fbkg, var, cut="",xbin,xmin,xmax,xlabel,save);
   makeHistos_sig_bkg_2plots(dir, fsig, fbkg, var, cut="Fj_chi>0",xbin,xmin,xmax,xlabel,save);
   makeHistos_sig_bkg_2plots(dir, fsig, fbkg, var, cut="Fj_chi<=0",xbin,xmin,xmax,xlabel,save);
+
+  //Matched Mj stuff
+
+  //makeHistos_2D(dir,fsig,"Mj_gen_matched_pdgID","Mj_pt","Mj_dR>0",50,0,500,30,-15.5,15.5,"Microjet p_{T}","matched genPdgID","COLZ",postfix,true);
 
 
 }

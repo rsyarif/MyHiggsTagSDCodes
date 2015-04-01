@@ -453,11 +453,11 @@ void Plot_efficiency(){
 }
 
 void Plot_efficiency_dMHigs10_dMHigs20(){
-  string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
+  string dir = "rootfiles";
   string deltaHiggsMass;
   string fsig;  string fsig2;
   string fbkg;  string fbkg2;
-  string postfix = "dRmax12_NoGenPtCut_NoFjPtCut_AllChi";
+  string postfix = "dRmax08_NoGenPtCut_NoFjPtCut_AllChi";
   double xbin = 40; double xmin = -18; double xmax = -2;
   bool save = false;
   string var = "log(Fj_chi)" ; string xlabel = "Log(#chi)";
@@ -469,8 +469,9 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
   Color_t color2 = kRed;
 
   deltaHiggsMass = "HiggsWin10";
-  fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
-  fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
+  fsig = "Rad_HHto4b_M800_13TeV_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
+  //fbkg = "TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
+  fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_"+deltaHiggsMass+"_mc_subjets";
   TFile *fs = new TFile((dir+"/"+"fMatch_"+fsig+"_"+postfix+".root").c_str());
   TFile *fb = new TFile((dir+"/"+"fMatch_"+fbkg+"_"+postfix+".root").c_str());
 
@@ -478,8 +479,9 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
   TH1D* h_bkg_t = PartonMatch_1D(dir,fb,fbkg,var,tight_cut,xbin,xmin,xmax,xlabel,postfix,color2,1,save);
 
   deltaHiggsMass = "HiggsWin20";
-  fsig2 = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
-  fbkg2 = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
+  fsig2 = "Rad_HHto4b_M800_13TeV_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
+  //fbkg2 = "TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
+  fbkg2 = "ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_"+deltaHiggsMass+"_mc_subjets";
   TFile *fs2 = new TFile((dir+"/"+"fMatch_"+fsig2+"_"+postfix+".root").c_str());
   TFile *fb2 = new TFile((dir+"/"+"fMatch_"+fbkg2+"_"+postfix+".root").c_str());
 
@@ -489,10 +491,15 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
 
   //---------Calculating efficiciencies----------
 
+  double Ssig_t = 2141; //number of matched sig with deltaR<0.05
+  double Sbkg_t = 993; //number of matched bkg with deltaR<0.05
+  double Ssig_t2 = 2141; //number of matched sig with deltaR<0.05
+  double Sbkg_t2 = 993; //number of matched bkg with deltaR<0.05
+
   int sig_t_nbins = h_sig_t->GetSize()-2;
   int bkg_t_nbins = h_bkg_t->GetSize()-2;
-  double Ssig_t = h_sig_t->Integral(0,sig_t_nbins+1);
-  double Sbkg_t = h_bkg_t->Integral(0,bkg_t_nbins+1);
+  //double Ssig_t = h_sig_t->Integral(0,sig_t_nbins+1);
+  //double Sbkg_t = h_bkg_t->Integral(0,bkg_t_nbins+1);
   double sig_t_integral[sig_t_nbins];
   double bkg_t_integral[bkg_t_nbins];
   double sig_t_eff[sig_t_nbins];
@@ -512,8 +519,8 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
 
   int sig_t2_nbins = h_sig_t2->GetSize()-2;
   int bkg_t2_nbins = h_bkg_t2->GetSize()-2;
-  double Ssig_t2 = h_sig_t2->Integral(0,sig_t2_nbins+1);
-  double Sbkg_t2 = h_bkg_t2->Integral(0,bkg_t2_nbins+1);
+  //double Ssig_t2 = h_sig_t2->Integral(0,sig_t2_nbins+1);
+  //double Sbkg_t2 = h_bkg_t2->Integral(0,bkg_t2_nbins+1);
   double sig_t2_integral[sig_t2_nbins];
   double bkg_t2_integral[bkg_t2_nbins];
   double sig_t2_eff[sig_t2_nbins];
@@ -539,7 +546,7 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
 
   TGraph *gr1_t = new TGraph(sig_t_nbins,x_t,sig_t_eff);
   gr1_t->SetName("gr1_t");
-  gr1_t->SetTitle("RadionHH");
+  gr1_t->SetTitle("RadionHH - HiggsWin10");
   gr1_t->SetMarkerStyle(21);
   gr1_t->SetMarkerColor(kGreen);
   gr1_t->SetDrawOption("AP");
@@ -549,7 +556,7 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
 
   TGraph *gr2_t = new TGraph(sig_t_nbins,x_t,bkg_t_eff);
   gr2_t->SetName("gr2_t");
-  gr2_t->SetTitle("ttjets");
+  gr2_t->SetTitle("ttjets - HiggsWin10");
   gr2_t->SetMarkerStyle(22);
   gr2_t->SetMarkerColor(kRed+4);
   gr2_t->SetDrawOption("P");
@@ -559,23 +566,25 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
 
   TGraph *gr1_t2 = new TGraph(sig_t2_nbins,x_t2,sig_t2_eff);
   gr1_t2->SetName("gr1_t2");
-  gr1_t2->SetTitle("RadionHH");
+  gr1_t2->SetTitle("RadionHH - HiggsWin20");
   gr1_t2->SetMarkerStyle(21);
   gr1_t2->SetMarkerColor(kGreen);
   gr1_t2->SetDrawOption("AP");
   gr1_t2->SetLineColor(kBlue);
   gr1_t2->SetLineWidth(2);
   gr1_t2->SetFillStyle(0);
+  gr1_t2->SetLineStyle(2);
 
   TGraph *gr2_t2 = new TGraph(sig_t2_nbins,x_t2,bkg_t2_eff);
   gr2_t2->SetName("gr2_t2");
-  gr2_t2->SetTitle("ttjets");
+  gr2_t2->SetTitle("ttjets - HiggsWin20");
   gr2_t2->SetMarkerStyle(22);
   gr2_t2->SetMarkerColor(kRed+4);
   gr2_t2->SetDrawOption("P");
   gr2_t2->SetLineColor(kRed);
   gr2_t2->SetLineWidth(2);
   gr2_t2->SetFillStyle(0);
+  gr2_t2->SetLineStyle(2);
 
   mg_t->Add( gr1_t );
   mg_t->Add( gr2_t );
@@ -639,10 +648,10 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
 
   TMultiGraph *mg_sb = new TMultiGraph("sb","sb");
 
-  gr1_t->SetTitle("HH - dR<0.05");
-  gr2_t->SetTitle("tt - dR<0.05");
-  gr1_t2->SetTitle("HH - dR<0.05");
-  gr2_t2->SetTitle("tt - dR<0.05");
+  gr1_t->SetTitle("HH - dR<0.05 - Hwin10");
+  gr2_t->SetTitle("tt - dR<0.05 - Hwin10");
+  gr1_t2->SetTitle("HH - dR<0.05 - Hwin20");
+  gr2_t2->SetTitle("tt - dR<0.05 - Hwin20");
 
   mg_sb->Add(gr1_t);
   mg_sb->Add(gr2_t);
@@ -653,7 +662,7 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
   mg_sb->GetXaxis()->SetTitle("log(#chi) >");
   mg_sb->GetYaxis()->SetTitle("Efficiency");
   mg_sb->SetTitle("after loose matching");
-  c_sb->BuildLegend(0.7,.65,.9,.9);
+  c_sb->BuildLegend(0.6,.65,.9,.9);
 
   c_sb->SaveAs((dir+"/"+"efficiency_sb_deltaHiggsMass.eps").c_str());
 
@@ -669,7 +678,7 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
   for(int i =0;i<bkg_t_nbins;i++)bkg_t_rej[i]=1-bkg_t_eff[i];
 
   TGraph *gr3_t = new TGraph(sig_t_nbins,sig_t_eff,bkg_t_rej);
-  gr3_t->SetTitle("tight");
+  gr3_t->SetTitle("SD_HiggsWin10");
   gr3_t->SetLineColor(kBlue);
   gr3_t->SetLineWidth(2);
   gr3_t->GetXaxis()->SetTitle("Eff_{sig}");
@@ -682,9 +691,10 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
   for(int i =0;i<bkg_t2_nbins;i++)bkg_t2_rej[i]=1-bkg_t2_eff[i];
 
   TGraph *gr3_t2 = new TGraph(sig_t2_nbins,sig_t2_eff,bkg_t2_rej);
-  gr3_t2->SetTitle("tight");
+  gr3_t2->SetTitle("SD_HiggsWin20");
   gr3_t2->SetLineColor(kBlue);
   gr3_t2->SetLineWidth(2);
+  gr3_t2->SetLineStyle(2);
   gr3_t2->GetXaxis()->SetTitle("Eff_{sig}");
   gr3_t2->GetYaxis()->SetTitle("1-Eff_{bkg}");
   gr3_t2->GetXaxis()->SetRangeUser(0,1);
