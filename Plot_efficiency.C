@@ -455,13 +455,14 @@ void Plot_efficiency(){
 void Plot_efficiency_dMHigs10_dMHigs20(){
   string dir = "rootfiles";
   string deltaHiggsMass;
-  string fsig;  string fsig2;
-  string fbkg;  string fbkg2;
+  string fsig;  string fsig2; string fsig3;
+  string fbkg;  string fbkg2; string fbkg3;
   string postfix = "dRmax08_NoGenPtCut_NoFjPtCut_AllChi";
   double xbin = 50; double xmin = -22; double xmax = -2;
   bool save = false;
   string var = "log(Fj_chi)" ; string xlabel = "Log(#chi)";
-  string cut = "Fj_chi>0";
+  //string cut = "Fj_chi>0";
+  string cut = "Fj_chi>0&&Fj_pt>300&&Fj_nMj>=2&&Fj_nBtagMj>=2";
   string loose_cut = cut;
   string medium_cut; if(cut==""){medium_cut = "dR_match<0.2";} else {medium_cut = ("dR_match<0.2&&"+cut).c_str();}  ;
   string tight_cut; if(cut==""){tight_cut = "dR_match<0.05";} else {tight_cut = ("dR_match<0.05&&"+cut).c_str();}  ;
@@ -486,13 +487,28 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
   TH1D* h_sig_t2 = PartonMatch_1D(dir,fs2,fsig2,var,tight_cut,xbin,xmin,xmax,xlabel,postfix,color1,2,save);
   TH1D* h_bkg_t2 = PartonMatch_1D(dir,fb2,fbkg2,var,tight_cut,xbin,xmin,xmax,xlabel,postfix,color2,2,save);
 
+  deltaHiggsMass = "HiggsWin30";
+  fsig3 = "Rad_HHto4b_M800_13TeV_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
+  fbkg3 = "ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_"+deltaHiggsMass+"_mc_subjets";
+  TFile *fs3 = new TFile((dir+"/"+"fMatch_"+fsig3+"_"+postfix+".root").c_str());
+  TFile *fb3 = new TFile((dir+"/"+"fMatch_"+fbkg3+"_"+postfix+".root").c_str());
+
+  TH1D* h_sig_t3 = PartonMatch_1D(dir,fs3,fsig3,var,tight_cut,xbin,xmin,xmax,xlabel,postfix,color1,2,save);
+  TH1D* h_bkg_t3 = PartonMatch_1D(dir,fb3,fbkg3,var,tight_cut,xbin,xmin,xmax,xlabel,postfix,color2,2,save);
+
 
   //---------Calculating efficiciencies----------
 
-  double Ssig_t = 2141; //number of matched sig with deltaR<0.05
-  double Sbkg_t = 993; //number of matched bkg with deltaR<0.05
-  double Ssig_t2 = 2141; //number of matched sig with deltaR<0.05
-  double Sbkg_t2 = 993; //number of matched bkg with deltaR<0.05
+  //double Ssig_t = 2141; //number of matched sig with deltaR<0.05
+  //double Sbkg_t = 1976; //number of matched bkg with deltaR<0.05
+
+  double Ssig_t = 871; //number of matched sig with deltaR<0.05, fj_pt>300, fj_nMj>=2, fj_nbtagMj>=2
+  double Sbkg_t = 617; //number of matched bkg with deltaR<0.05, fj_pt>300, fj_nMj>=2, fj_nbtagMj>=2
+
+  double Ssig_t2 = Ssig_t;
+  double Sbkg_t2 = Sbkg_t;
+  double Ssig_t3 = Ssig_t;
+  double Sbkg_t3 = Sbkg_t;
 
   int sig_t_nbins = h_sig_t->GetSize()-2;
   int bkg_t_nbins = h_bkg_t->GetSize()-2;
@@ -531,6 +547,27 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
     bkg_t2_eff[i] = bkg_t2_integral[i]/Sbkg_t2;
     x_t2[i] = xmin + increment_t2*i;
     cout<<i+1<<". x = "<<x_t2[i]<< ", sig_t2 =  "<< sig_t2_integral[i]/Ssig_t2<< ", bkg_t2 = "<< bkg_t2_integral[i]/Sbkg_t2 << endl;
+  }
+  cout << endl;
+
+  int sig_t3_nbins = h_sig_t3->GetSize()-2;
+  int bkg_t3_nbins = h_bkg_t3->GetSize()-2;
+  //double Ssig_t3 = h_sig_t3->Integral(0,sig_t3_nbins+1);
+  //double Sbkg_t3 = h_bkg_t3->Integral(0,bkg_t3_nbins+1);
+  double sig_t3_integral[sig_t3_nbins];
+  double bkg_t3_integral[bkg_t3_nbins];
+  double sig_t3_eff[sig_t3_nbins];
+  double bkg_t3_eff[bkg_t3_nbins];
+  double x_t3[sig_t3_nbins]; //double xmin = -18.; double xmax = -2.;
+  double increment_t3 = (xmax-xmin)/sig_t3_nbins;
+  cout<<"---tight--- dMHigs 30"<<endl;
+  for(int i=0;i<sig_t3_nbins;i++){
+    sig_t3_integral[i]=h_sig_t3->Integral(i+1,sig_t3_nbins+1);
+    bkg_t3_integral[i]=h_bkg_t3->Integral(i+1,bkg_t3_nbins+1);
+    sig_t3_eff[i] = sig_t3_integral[i]/Ssig_t3;
+    bkg_t3_eff[i] = bkg_t3_integral[i]/Sbkg_t3;
+    x_t3[i] = xmin + increment_t3*i;
+    cout<<i+1<<". x = "<<x_t3[i]<< ", sig_t3 =  "<< sig_t3_integral[i]/Ssig_t3<< ", bkg_t3 = "<< bkg_t3_integral[i]/Sbkg_t3 << endl;
   }
   cout << endl;
 
@@ -582,16 +619,40 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
   gr2_t2->SetFillStyle(0);
   gr2_t2->SetLineStyle(2);
 
+  TGraph *gr1_t3 = new TGraph(sig_t3_nbins,x_t3,sig_t3_eff);
+  gr1_t3->SetName("gr1_t3");
+  gr1_t3->SetTitle("RadionHH - HiggsWin30");
+  gr1_t3->SetMarkerStyle(21);
+  gr1_t3->SetMarkerColor(kGreen);
+  gr1_t3->SetDrawOption("AP");
+  gr1_t3->SetLineColor(kBlue);
+  gr1_t3->SetLineWidth(2);
+  gr1_t3->SetFillStyle(0);
+  gr1_t3->SetLineStyle(3);
+
+  TGraph *gr2_t3 = new TGraph(sig_t3_nbins,x_t3,bkg_t3_eff);
+  gr2_t3->SetName("gr2_t3");
+  gr2_t3->SetTitle("ttjets - HiggsWin30");
+  gr2_t3->SetMarkerStyle(22);
+  gr2_t3->SetMarkerColor(kRed+4);
+  gr2_t3->SetDrawOption("P");
+  gr2_t3->SetLineColor(kRed);
+  gr2_t3->SetLineWidth(2);
+  gr2_t3->SetFillStyle(0);
+  gr2_t3->SetLineStyle(3);
+
   mg_t->Add( gr1_t );
   mg_t->Add( gr2_t );
   mg_t->Add( gr1_t2 );
   mg_t->Add( gr2_t2 );
+  mg_t->Add( gr1_t3 );
+  mg_t->Add( gr2_t3 );
 
   mg_t->Draw("APL");
   mg_t->GetXaxis()->SetTitle("log(#chi) >");
   mg_t->GetYaxis()->SetTitle("Efficiency");
   mg_t->SetTitle("after loose matching");
-  c3_t->BuildLegend(0.7,.75,.9,.9);
+  c3_t->BuildLegend(0.7,.65,.9,.9);
 
   c3_t->SaveAs((dir+"/"+"efficiency_tight_deltaHiggsMass.eps").c_str());
 
@@ -604,9 +665,11 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
 
   mg_sig->Add(gr1_t);
   mg_sig->Add(gr1_t2);
+  mg_sig->Add(gr1_t3);
 
   gr1_t->SetMarkerStyle(7);
   gr1_t2->SetMarkerStyle(4);
+  gr1_t3->SetMarkerStyle(5);
 
   mg_sig->Draw("APL");
   mg_sig->GetXaxis()->SetTitle("log(#chi) >");
@@ -625,9 +688,11 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
 
   mg_bkg->Add(gr2_t);
   mg_bkg->Add(gr2_t2);
+  mg_bkg->Add(gr2_t3);
 
   gr2_t->SetMarkerStyle(7);
   gr2_t2->SetMarkerStyle(4);
+  gr2_t3->SetMarkerStyle(5);
 
   mg_bkg->Draw("APL");
   mg_bkg->GetXaxis()->SetTitle("log(#chi) >");
@@ -648,11 +713,15 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
   gr2_t->SetTitle("tt - dR<0.05 - Hwin10");
   gr1_t2->SetTitle("HH - dR<0.05 - Hwin20");
   gr2_t2->SetTitle("tt - dR<0.05 - Hwin20");
+  gr1_t3->SetTitle("HH - dR<0.05 - Hwin30");
+  gr2_t3->SetTitle("tt - dR<0.05 - Hwin30");
 
   mg_sb->Add(gr1_t);
   mg_sb->Add(gr2_t);
   mg_sb->Add(gr1_t2);
   mg_sb->Add(gr2_t2);
+  mg_sb->Add(gr1_t3);
+  mg_sb->Add(gr2_t3);
 
   mg_sb->Draw("APL");
   mg_sb->GetXaxis()->SetTitle("log(#chi) >");
@@ -697,8 +766,23 @@ void Plot_efficiency_dMHigs10_dMHigs20(){
   gr3_t2->GetYaxis()->SetRangeUser(0,1);
   gr3_t2->SetFillStyle(0);
 
+  double bkg_t3_rej[bkg_t3_nbins];
+  for(int i =0;i<bkg_t3_nbins;i++)bkg_t3_rej[i]=1-bkg_t3_eff[i];
+
+  TGraph *gr3_t3 = new TGraph(sig_t3_nbins,sig_t3_eff,bkg_t3_rej);
+  gr3_t3->SetTitle("SD_HiggsWin30");
+  gr3_t3->SetLineColor(kBlue);
+  gr3_t3->SetLineWidth(2);
+  gr3_t3->SetLineStyle(3);
+  gr3_t3->GetXaxis()->SetTitle("Eff_{sig}");
+  gr3_t3->GetYaxis()->SetTitle("1-Eff_{bkg}");
+  gr3_t3->GetXaxis()->SetRangeUser(0,1);
+  gr3_t3->GetYaxis()->SetRangeUser(0,1);
+  gr3_t3->SetFillStyle(0);
+
   mg_ROC->Add(gr3_t);
   mg_ROC->Add(gr3_t2);
+  mg_ROC->Add(gr3_t3);
 
   mg_ROC->Draw("APL");
   mg_ROC->GetXaxis()->SetTitle("Eff_{sig}");
