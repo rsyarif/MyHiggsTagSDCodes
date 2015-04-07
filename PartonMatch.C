@@ -162,7 +162,7 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
   //loop over events
   if(display)cout << endl;
   for (int i =0 ; i<nEvent;i++){
-  //for (int i =0 ; i<10;i++){
+  //for (int i =0 ; i<40;i++){
     t->GetEntry(i);
     tf->GetEntry(i);
     if(display)cout << endl;
@@ -252,12 +252,14 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
 	    int ib = 0;
 	    int mother_idx;
 	    for(int iGenMj=0; iGenMj < nGenPruned; iGenMj++){
+
+
 	      if(abs(GenPruned_pdgID[iGenMj])==gen_pdgid) continue; // dont match with fatjet gen
 
 	      Mj_gen_pt[ib] = GenPruned_pT[iGenMj];
 	      Mj_gen_pdgID[ib] = GenPruned_pdgID[iGenMj];
 	      if(GenPruned_mother[iGenMj]>0)Mj_gen_motherID[ib] = GenPruned_pdgID[GenPruned_mother[iGenMj]];
-	      ib++;
+
 
 	      if(display)cout<<endl;
 	      if(display)cout<< "                             GenPruned no. "<< iGenMj << " : GenPruned_pdgID = " << GenPruned_pdgID[iGenMj] <<endl;
@@ -267,22 +269,31 @@ int PartonMatch(std::string fdir, std::string fname, int gen_pdgid,double dRmax 
 	      if(display)cout<< "                             " << l<< "-"<<iGenMj<<", -------------------------------->  delta R = "<< dR_Mj;// << endl;
 
 	      //matching dR requirement
-	      if(dR_Mj>MjCone)continue;
-	      if(display)cout<<"----> Mj-Parton MATCH!! ";
-	      if(fabs(Mj_dR[iMj])<dR_Mj) continue; //TO MAKE SURE THIS RECORDS THE SMALLEST deltaR!!
-	      if(GenPruned_mother[iGenMj]>0&&abs(GenPruned_pdgID[GenPruned_mother[iGenMj]])==5)continue; //if mother is b then record deltaR with b.
+	      if(dR_Mj<MjCone){
 
-	      Mj_dR[iMj] = dR_Mj;
-	      Mj_dR_genIdx[iMj] = ib;
-	      Mj_gen_matched_pdgID[iMj] = GenPruned_pdgID[iGenMj];
-	      if(GenPruned_mother[iGenMj]>0)Mj_gen_matched_motherID[iMj] = GenPruned_pdgID[GenPruned_mother[iGenMj]];
-	      Mj_gen_matched_pt[iMj] = GenPruned_pT[iGenMj];
-	      Mj_gen_isMatch[ib] = 1;
-	      iMatchMj++;
+		if(display)cout<<"----> Mj-Parton MATCH!! ";
 
-	      if(display)cout<<"Mj_dR["<<iMj<<"]: "<<Mj_dR[iMj]<<"(recorded)";
+		if(fabs(Mj_dR[iMj])>dR_Mj){ //TO MAKE SURE THIS RECORDS THE SMALLEST deltaR!!
 
+		  if(GenPruned_mother[iGenMj]>0&&abs(GenPruned_pdgID[GenPruned_mother[iGenMj]])!=5){ //if mother is b then skip and record deltaR with b.
 
+		    Mj_dR[iMj] = dR_Mj;
+		    Mj_dR_genIdx[iMj] = ib;
+		    Mj_gen_matched_pdgID[iMj] = GenPruned_pdgID[iGenMj];
+		    if(GenPruned_mother[iGenMj]>0)Mj_gen_matched_motherID[iMj] = GenPruned_pdgID[GenPruned_mother[iGenMj]];
+		    Mj_gen_matched_pt[iMj] = GenPruned_pT[iGenMj];
+		    Mj_gen_isMatch[ib] = 1;
+		    iMatchMj++;
+
+		    if(display)cout<<"Mj_dR["<<iMj<<"]: "<<Mj_dR[iMj]<<"(recorded)";
+
+		  }//end if check mother
+
+		}//end if record minimum
+
+	      }//end if dR<cone
+
+	      ib++;
 	    }//end Gen Mj match loop
 
 	    //SV Matching loop (Mj_dR_SV calculation)
@@ -347,10 +358,10 @@ void PartonMatch(bool display = false){
   deltaHiggsMass = "HiggsWin10";
   fsig = "Rad_HHto4b_M800_13TeV_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
   fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_"+deltaHiggsMass+"_mc_subjets";
-  //int sig_l = PartonMatch(dir,fsig,25,dRmax,MjCone,display,postfix);
-  //int bkg_l = PartonMatch(dir,fbkg,6,dRmax,MjCone,display,postfix);
+  int sig_l = PartonMatch(dir,fsig,25,dRmax,MjCone,display,postfix);
+  int bkg_l = PartonMatch(dir,fbkg,6,dRmax,MjCone,display,postfix);
 
-  deltaHiggsMass = "HiggsWin2";
+  deltaHiggsMass = "HiggsWin20";
   //deltaHiggsMass = "HiggsWin20_WRONGtagrate35";
   fsig = "Rad_HHto4b_M800_13TeV_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
   fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_"+deltaHiggsMass+"_mc_subjets";
@@ -360,8 +371,8 @@ void PartonMatch(bool display = false){
   deltaHiggsMass = "HiggsWin30";
   fsig = "Rad_HHto4b_M800_13TeV_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
   fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_"+deltaHiggsMass+"_mc_subjets";
-  //int sig_l = PartonMatch(dir,fsig,25,dRmax,MjCone,display,postfix);
-  //int bkg_l = PartonMatch(dir,fbkg,6,dRmax,MjCone,display,postfix);
+  int sig_l = PartonMatch(dir,fsig,25,dRmax,MjCone,display,postfix);
+  int bkg_l = PartonMatch(dir,fbkg,6,dRmax,MjCone,display,postfix);
 }
 
 double deltaR(double eta1, double phi1, double eta2, double phi2){
@@ -775,7 +786,7 @@ void makeHistos_Fj_gen_pt_4plots(bool save = false, bool display = false){
 
 }
 
-void makeHistos_Fj_gen_pt_2plots(bool save = false, std::string dir, std::string fsig, std::string cut, double xbin, double xmin, double xmax, std::string postfix){
+void  makeHistos_Fj_gen_pt_2plots(bool save = false, std::string dir, std::string fsig, std::string cut, double xbin, double xmin, double xmax, std::string postfix){
 
   string var = "Fj_pt";
   string var_gen = "gen_pt";
@@ -933,6 +944,12 @@ void makeHistos_Fj_gen_pt_2plots(bool save = false, std::string dir, std::string
   gPad->Update();
   if(save)canvas_t->SaveAs((dir+"/fj_gen_2plots_tight_match"+"_"+fsig+"_"+var+"_"+cut+".eps").c_str());
 
+  if(save)TFile *fout = new TFile((dir+"/PLOTS_fj_gen_2plots_tight_match"+"_"+fsig+"_"+var+"_"+cut+".root").c_str(),"RECREATE");
+  if(save)fout->cd();
+  if(save)h_fj_t->Write("h_fj_t");
+  if(save)h_gen_t->Write("h_gen_t");
+  if(save)fout->Close();
+
 }
 
 void makeHistos_Fj_gen_chi(bool save = false, bool display = false){
@@ -1032,7 +1049,7 @@ void makeHistos_1plot(std::string dir, std::string fname, std::string var, std::
   TH1D* h_s = PartonMatch_1D(dir,f,fname,var,cut,xbin,xmin,xmax,xlabel,postfix,color,linestyle,save);
 }
 
-void makeHistos_sig_bkg_2plots(std::string dir, std::string fsig, std::string fbkg, std::string var, std::string cut, double xbin, double xmin, double xmax, std::string xlabel, bool save = false, bool isLeg = true){
+void  makeHistos_sig_bkg_2plots(std::string dir, std::string fsig, std::string fbkg, std::string var, std::string cut, double xbin, double xmin, double xmax, std::string xlabel, bool save = false, bool isLeg = true){
 
   string postfix = "dRmax08_NoGenPtCut_NoFjPtCut_AllChi";
 
@@ -1193,8 +1210,10 @@ void Alakazam(){
   string cut;
   bool save;
 
-  //deltaHiggsMass = "HiggsWin20";
-  deltaHiggsMass = "HiggsWin20_WRONGtagrate35";
+  TFile *fout = new TFile("f_histo.root","RECREATE");
+
+  deltaHiggsMass = "HiggsWin20";
+  //deltaHiggsMass = "HiggsWin20_WRONGtagrate35";
   fsig = "Rad_HHto4b_M800_13TeV_AOD_R08_r015_"+deltaHiggsMass+"_mc_subjets";
   fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_"+deltaHiggsMass+"_mc_subjets";
 
@@ -1233,13 +1252,16 @@ void Alakazam(){
   xbin = 50;  xmin = -22;  xmax = -2;
   save = true;
   makeHistos_sig_bkg_2plots(dir,fsig,fbkg,var,"Fj_chi>0",xbin,xmin,xmax,xlabel,save,1);
+  makeHistos_sig_bkg_2plots(dir,fsig,fbkg,var,"Fj_nMj>=2&&Fj_chi>0",xbin,xmin,xmax,xlabel,save,1);
+  makeHistos_sig_bkg_2plots(dir,fsig,fbkg,var,"Fj_nMj>=2&&Fj_nBtagMj>=2&&Fj_chi>0",xbin,xmin,xmax,xlabel,save,1);
   makeHistos_sig_bkg_2plots(dir,fsig,fbkg,var,"Fj_pt>300&&Fj_chi>0",xbin,xmin,xmax,xlabel,save,1);
   makeHistos_sig_bkg_2plots(dir,fsig,fbkg,var,"Fj_pt>300&&Fj_nMj>=2&&Fj_nBtagMj>=2&&Fj_chi>0",xbin,xmin,xmax,xlabel,save,1);
 
   var = "Fj_pt" ;  xlabel = "Fatjet p_{T}";
   xbin = 50;  xmin = 0;  xmax = 1000;
-  save = false;
+  save = true;
   makeHistos_sig_bkg_2plots(dir,fsig,fbkg,var,"",xbin,xmin,xmax,xlabel,save,1);
+  makeHistos_sig_bkg_2plots(dir,fsig,fbkg,var,"Fj_nMj>=2",xbin,xmin,xmax,xlabel,save,1);
   makeHistos_sig_bkg_2plots(dir,fsig,fbkg,var,"Fj_nMj>=2&&Fj_nBtagMj>=2",xbin,xmin,xmax,xlabel,save,1);
   makeHistos_sig_bkg_2plots(dir,fsig,fbkg,var,"Fj_pt>300&&Fj_nMj>=2&&Fj_nBtagMj>=2",xbin,xmin,xmax,xlabel,save,1);
 
@@ -1476,6 +1498,14 @@ void Alakazam(){
   Plot_PartonMatch_2D(dir,fsig,var1,var2,"Fj_pt>300&&dR_match<0.05&&Mj_dR>0&&Mj_dR<0.04&&Fj_chi>0",xbin,xmin,xmax,ybin,ymin,ymax,xlabel,ylabel,"LEGO2Z",postfix,save);
   Plot_PartonMatch_2D(dir,fsig,var1,var2,"Fj_pt>300&&dR_match<0.05&&Mj_dR>0&&Mj_dR<0.04&&Fj_chi<=0",xbin,xmin,xmax,ybin,ymin,ymax,xlabel,ylabel,"LEGO2Z",postfix,save);
 
+  Plot_PartonMatch_2D(dir,fsig,var1,var2,"Fj_pt>300&&Fj_nMj>=2&&Fj_nBtagMj>=2&&dR_match<0.05&&Mj_dR>0&&Mj_dR<0.04",xbin,xmin,xmax,ybin,ymin,ymax,xlabel,ylabel,"COLZ",postfix,save);
+  Plot_PartonMatch_2D(dir,fsig,var1,var2,"Fj_pt>300&&Fj_nMj>=2&&Fj_nBtagMj>=2&&dR_match<0.05&&Mj_dR>0&&Mj_dR<0.04&&Fj_chi>0",xbin,xmin,xmax,ybin,ymin,ymax,xlabel,ylabel,"COLZ",postfix,save);
+  Plot_PartonMatch_2D(dir,fsig,var1,var2,"Fj_pt>300&&Fj_nMj>=2&&Fj_nBtagMj>=2&&dR_match<0.05&&Mj_dR>0&&Mj_dR<0.04&&Fj_chi<=0",xbin,xmin,xmax,ybin,ymin,ymax,xlabel,ylabel,"COLZ",postfix,save);
+
+  Plot_PartonMatch_2D(dir,fsig,var1,var2,"Fj_pt>300&&Fj_nMj>=2&&Fj_nBtagMj>=2&&dR_match<0.05&&Mj_dR>0&&Mj_dR<0.04",xbin,xmin,xmax,ybin,ymin,ymax,xlabel,ylabel,"LEGO2Z",postfix,save);
+  Plot_PartonMatch_2D(dir,fsig,var1,var2,"Fj_pt>300&&Fj_nMj>=2&&Fj_nBtagMj>=2&&dR_match<0.05&&Mj_dR>0&&Mj_dR<0.04&&Fj_chi>0",xbin,xmin,xmax,ybin,ymin,ymax,xlabel,ylabel,"LEGO2Z",postfix,save);
+  Plot_PartonMatch_2D(dir,fsig,var1,var2,"Fj_pt>300&&Fj_nMj>=2&&Fj_nBtagMj>=2&&dR_match<0.05&&Mj_dR>0&&Mj_dR<0.04&&Fj_chi<=0",xbin,xmin,xmax,ybin,ymin,ymax,xlabel,ylabel,"LEGO2Z",postfix,save);
+
   var = "Mj_gen_matched_pdgID" ;
   xbin = 31;  xmin = -15.5;  xmax = 15.5;   xlabel = "(matched) gen pdgID";
   save = false;
@@ -1651,7 +1681,5 @@ void Alakazam(){
 
   makeHistos_1plot(dir,fsig,var,"Mj_dR>0&&Mj_dR<0.04&&Mj_isBtag==1&&abs(Mj_gen_matched_pdgID)!=5",xbin,xmin,xmax,xlabel,postfix,kBlue,1,save);
   makeHistos_1plot(dir,fbkg,var,"Mj_dR>0&&Mj_dR<0.04&&Mj_isBtag==1&&abs(Mj_gen_matched_pdgID)!=5",xbin,xmin,xmax,xlabel,postfix,kRed,1,save);
-
-
 
 }
