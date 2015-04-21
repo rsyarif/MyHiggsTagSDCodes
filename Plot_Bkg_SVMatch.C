@@ -4,12 +4,12 @@
   //string fname = "QCD_Pt-470to600_Tune4C_13TeV_pythia8";
   string fname = "QCD_Pt-300to470_Tune4C_13TeV_pythia8";
 
-  TFile *f = new TFile(("rootfiles/"+prefix+fname+"_R08_r015_HiggsWin20_tagr07_fake02_BtagALLMj_MjIVF015_mc_subjets.root").c_str());
-  TTree *t = (TTree*) f->Get("tree");
-
   TCanvas *c1 = new TCanvas();
 
   gStyle->SetOptStat("nemrou");
+
+  TFile *f = new TFile(("rootfiles/"+prefix+fname+"_R08_r015_HiggsWin20_tagr07_fake02_BtagALLMj_MjIVF015_mc_subjets.root").c_str());
+  TTree *t = (TTree*) f->Get("tree");
 
   t->Draw("Mj_pt","abs(Fj_flavour)!=5&&abs(Fj_flavour)!=4");
 
@@ -247,13 +247,10 @@
       if(Jet_SV_multi[j]>0) h4->Fill(Jet_SV_multi[j]);
 
       //loop over SV
-      int iSV = 0; int first; int last;
-      first = Jet_nFirstSV[j];
-      last = Jet_nLastSV[j];
-      for(int jSV = first; jSV < last ; jSV++){
-
-  	iSV++;
-      }
+      //int iSV = 0; int first = Jet_nFirstSV[j]; int last = Jet_nLastSV[j];
+      //for(int jSV = first; jSV < last ; jSV++){
+      //iSV++;
+      //}
 
   	//Microjet loop
       int iMj_=0;
@@ -311,7 +308,7 @@
   }
 
   TGraph *gr = new TGraph(nbins,x,Y);
-  gr->Draw("APL");
+  gr->Draw("AP*L");
   gr->SetTitle("ratio of #frac{IVF matched, non-b/c Mj}{non-b/c Mj}");
   gr->GetXaxis()->SetTitle("p_{T}");
 
