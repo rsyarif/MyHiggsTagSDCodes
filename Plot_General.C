@@ -9,7 +9,8 @@ TH1F* makeHisto(std::string dir, TFile *f, std::string fname, std::string rdir ,
 
   tf->Draw((var+">>"+fname).c_str(),cut.c_str());
 
-  gStyle->SetOptStat("nemrou");
+  //gStyle->SetOptStat("nemrou");
+  gStyle->SetOptStat("emrou");
   h->SetLineColor(color);
   h->SetLineWidth(2);
   h->SetLineStyle(linestyle);
@@ -41,7 +42,8 @@ void Plot_General_sig_bkg(bool save = false, std::string dir, std::string fsig, 
   h1->SetStats(1);
   h2->SetStats(1);
 
-  gStyle->SetOptStat("nemrou");
+  //gStyle->SetOptStat("nemrou");
+  gStyle->SetOptStat("emrou");
 
   //c2->cd();
   //h1->Draw();
@@ -155,7 +157,8 @@ void Plot_General_fj_gen(bool save = false,std::string dir, std::string fsig, st
 
   TCanvas *c = new TCanvas("SD", "SD",800, 600);
 
-  gStyle->SetOptStat("nemrou");
+  //gStyle->SetOptStat("nemrou");
+  gStyle->SetOptStat("emrou");
 
   c->cd();
 
@@ -202,8 +205,10 @@ void Plot_General_fj_gen(bool save = false,std::string dir, std::string fsig, st
 void Alakazam(){
 
   std::string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
-  std::string fsig ="RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_HiggsWin20_mc_subjets";
-  std::string fbkg ="ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_HiggsWin20_mc_subjets";
+  //std::string fsig ="RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_HiggsWin20_mc_subjets";
+  //std::string fbkg ="ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_HiggsWin20_mc_subjets";
+  std::string fsig ="RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_HiggsWin10_mc_subjets";
+  std::string fbkg ="ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_HiggsWin10_mc_subjets";
 
   std::string rdir = "btaganaSubJets";
   std::string rdir_gen = "btagana";
