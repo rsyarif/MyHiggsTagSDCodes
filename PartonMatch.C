@@ -385,7 +385,7 @@ TH1D* PartonMatch_1D(std::string dir, TFile* f, std::string fname,  std::string 
 
   t->Draw((var+">>"+var_+cut+postfix).c_str(),cut.c_str());
 
-  gStyle->SetOptStat("nemrou");
+  gStyle->SetOptStat("emrou");
 
   h->SetLineWidth(2);
   h->SetLineColor(color);
@@ -470,7 +470,7 @@ void makeHistos(bool save = false, bool display = false){
   h_bkg_m->SetStats(1);
   h_bkg_t->SetStats(1);
 
-  gStyle->SetOptStat("nemrou");
+  gStyle->SetOptStat("emrou");
   gPad->Update();
 
   fhistos->cd();
@@ -670,7 +670,7 @@ void makeHistos_Fj_gen_pt_4plots(bool save = false, bool display = false){
   //cout<<"Creating "<< dir+"/"+"PartonMatch_makeHistos_Fj_gen_pt.root"<< endl;
   //TFile *fhistos = new TFile((dir+"/"+"PartonMatch_makeHistos_Fj_gen_pt.root").c_str(),"RECREATE");
 
-  gStyle->SetOptStat("nemrou");
+  gStyle->SetOptStat("emrou");
 
  //--------loose-------
   canvas_l->cd();
@@ -770,7 +770,7 @@ void makeHistos_Fj_gen_pt_2plots(bool save = false, std::string dir, std::string
   TCanvas* canvas_m = new TCanvas("medium matching","medium matching",800,600);
   TCanvas* canvas_t = new TCanvas("tight matching","tight matching",800,600);
 
-  gStyle->SetOptStat("nemrou");
+  gStyle->SetOptStat("emrou");
 
   Double_t norm1;
   Double_t norm2;
@@ -785,7 +785,7 @@ void makeHistos_Fj_gen_pt_2plots(bool save = false, std::string dir, std::string
 
   h_gen_l->Draw();
   h_fj_l->Draw("SAME");
-  leg = new TLegend(0.55,0.65,0.85,0.85);
+  leg = new TLegend(0.55,0.65,0.65,0.85);
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
   leg->AddEntry(h_fj_l,"fatjet","L");
@@ -819,7 +819,7 @@ void makeHistos_Fj_gen_pt_2plots(bool save = false, std::string dir, std::string
 
   h_gen_m->Draw();
   h_fj_m->Draw("SAME");
-  leg = new TLegend(0.55,0.65,0.85,0.85);
+  leg = new TLegend(0.55,0.65,0.65,0.85);
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
   leg->AddEntry(h_fj_m,"fatjet","L");
@@ -853,7 +853,7 @@ void makeHistos_Fj_gen_pt_2plots(bool save = false, std::string dir, std::string
 
   h_gen_t->Draw();
   h_fj_t->Draw("SAME");
-  leg = new TLegend(0.55,0.65,0.85,0.85);
+  leg = new TLegend(0.55,0.65,0.65,0.85);
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
   leg->AddEntry(h_fj_t,"fatjet","L");
@@ -922,7 +922,7 @@ void makeHistos_Fj_gen_chi(bool save = false, bool display = false){
   //cout<<"Creating "<< dir+"/"+"PartonMatch_makeHistos_Fj_gen_chi.root"<< endl;
   //TFile *fhistos = new TFile((dir+"/"+"PartonMatch_makeHistos_Fj_gen_chi.root").c_str(),"RECREATE");
 
-  gStyle->SetOptStat("nemrou");
+  gStyle->SetOptStat("emrou");
 
   //--------loose-----------
   canvas_l->cd();
@@ -991,7 +991,7 @@ void makeHistos_sig_bkg_2plots(std::string dir, std::string fsig, std::string fb
 
   TCanvas* canvas_t = new TCanvas("tight matching","tight matching",800,600);
 
-  gStyle->SetOptStat("nemrou");
+  gStyle->SetOptStat("emrou");
 
   Double_t norm1;
   Double_t norm2;
@@ -1044,7 +1044,8 @@ void makeHistos_sig_bkg_2plots(std::string dir, std::string fsig, std::string fb
 
 void Alakazam(){
   string dir = "allChi_noMinFatjetPt_noMjBtagCondition";
-  string deltaHiggsMass = "HiggsWin20";
+  //string deltaHiggsMass = "HiggsWin20";
+  string deltaHiggsMass = "HiggsWin10";
   string fsig = "RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
   string fbkg = "ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola_R12_r15_minPt0_Nobtagmjcondition_AllChi_"+deltaHiggsMass+"_mc_subjets";
 
@@ -1056,9 +1057,9 @@ void Alakazam(){
   //makeHistos_Fj_gen_pt_2plots(save, dir, fsig, "Fj_chi>0", xbin, xmin, xmax, postfix);
   //makeHistos_Fj_gen_pt_2plots(save, dir, fsig, "Fj_chi<=0", xbin, xmin, xmax, postfix);
 
-  makeHistos_Fj_gen_pt_2plots(save, dir, fbkg, "", xbin, xmin, xmax, postfix);
-  makeHistos_Fj_gen_pt_2plots(save, dir, fbkg, "Fj_chi>0", xbin, xmin, xmax, postfix);
-  makeHistos_Fj_gen_pt_2plots(save, dir, fbkg, "Fj_chi<=0", xbin, xmin, xmax, postfix);
+  //makeHistos_Fj_gen_pt_2plots(save, dir, fbkg, "", xbin, xmin, xmax, postfix);
+  //makeHistos_Fj_gen_pt_2plots(save, dir, fbkg, "Fj_chi>0", xbin, xmin, xmax, postfix);
+  //makeHistos_Fj_gen_pt_2plots(save, dir, fbkg, "Fj_chi<=0", xbin, xmin, xmax, postfix);
 
   string var = "log(Fj_chi)" ; string xlabel = "Log(#chi)";
   double xbin = 50; double xmin = -22; double xmax = -2;
@@ -1066,14 +1067,14 @@ void Alakazam(){
   //makeHistos_sig_bkg_2plots(dir,fsig,fbkg,var,"Fj_chi>0",xbin,xmin,xmax,xlabel,save);
 
 
-  /*
-  makeHistos_sig_bkg_2plots(true, var="Fj_nMj", cut="",10,-0.5,9.5);
-  makeHistos_sig_bkg_2plots(true, var="Fj_nMj", cut="Fj_chi>0",10,-0.5,9.5);
-  makeHistos_sig_bkg_2plots(true, var="Fj_nMj", cut="Fj_chi<=0",10,-0.5,9.5);
-  makeHistos_sig_bkg_2plots(true, var="Fj_nBtagMj", cut="",10,-0.5,9.5);
-  makeHistos_sig_bkg_2plots(true, var="Fj_nBtagMj", cut="Fj_chi>0",10,-0.5,9.5);
-  makeHistos_sig_bkg_2plots(true, var="Fj_nBtagMj", cut="Fj_chi<=0",10,-0.5,9.5);
-  */
+
+  makeHistos_sig_bkg_2plots(dir, fsig, fbkg, var="Fj_nMj", cut="",10,-0.5,9.5,"# of Microjets", true);
+  makeHistos_sig_bkg_2plots(dir, fsig, fbkg, var="Fj_nMj", cut="Fj_chi>0",10,-0.5,9.5,"# of Microjets", true);
+  makeHistos_sig_bkg_2plots(dir, fsig, fbkg, var="Fj_nMj", cut="Fj_chi<=0",10,-0.5,9.5,"# of Microjets", true);
+  makeHistos_sig_bkg_2plots(dir, fsig, fbkg, var="Fj_nBtagMj", cut="",10,-0.5,9.5,"# of (IVF) btagged Microjets", true);
+  makeHistos_sig_bkg_2plots(dir, fsig, fbkg, var="Fj_nBtagMj", cut="Fj_chi>0",10,-0.5,9.5,"# of (IVF) btagged Microjets", true);
+  makeHistos_sig_bkg_2plots(dir, fsig, fbkg, var="Fj_nBtagMj", cut="Fj_chi<=0",10,-0.5,9.5,"# of (IVF) btagged Microjets", true);
+
 
   /*
   makeHistos_sig_bkg_2plots(dir, fsig, fbkg, var="Mj_pt", cut="",50,0,400, true);
