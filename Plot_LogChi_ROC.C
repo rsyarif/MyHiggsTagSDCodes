@@ -1,4 +1,4 @@
-using namespace std;
+namespace using std;
 
 Color_t c_h1 = kBlue;
 Color_t c_h2 = kRed;
@@ -129,7 +129,7 @@ void Plot_3bkg(TFile *fs, TFile *fb1, TFile*fb2, string var, string cut, string 
 
   gPad->Update();
 
-  c1->SaveAs(("rootfiles/TEMP_"+fsave+".eps").c_str());
+  c1->SaveAs(("plots/"+fsave+".eps").c_str());
 
   fTEMP->Close();
 }
@@ -239,14 +239,15 @@ void ROC_3bkg(string fname,string fdenom,string fsave, const int xbin, double xm
   ROC->GetXaxis()->SetTitle("Eff_{sig}");
   ROC->GetYaxis()->SetTitle("1-Eff_{bkg}");
   ROC->GetXaxis()->SetLimits(0.,1.);
-  ROC->GetYaxis()->SetLimits(0.,1.);
+  //ROC->GetYaxis()->SetLimits(0.,1.);
+  ROC->SetMaximum(1.);ROC->SetMinimum(0.);
   ROC->SetTitle("ROC Curves");
 
   c->BuildLegend(0.2,0.2,0.2+0.2,0.2+0.15);
 
   gPad->Update();
 
-  c->SaveAs(("rootfiles/TEMP_ROC_"+fsave+".eps").c_str());
+  c->SaveAs(("plots/ROC_"+fsave+".eps").c_str());
 
   fTEMP->Close();
 }
@@ -287,14 +288,15 @@ void ROC_combined_3bkg(string fname1, string fname2, string fsave,vector<string>
   ROC->GetXaxis()->SetTitle("Eff_{sig}");
   ROC->GetYaxis()->SetTitle("1-Eff_{bkg}");
   ROC->GetXaxis()->SetLimits(0.,1.);
-  ROC->GetYaxis()->SetLimits(0.,1.);
+  //ROC->GetYaxis()->SetLimits(0.,1.);
+  ROC->SetMaximum(1.);ROC->SetMinimum(0.);
   ROC->SetTitle("ROC Curves");
 
   c->BuildLegend(0.2,0.2,0.2+0.3,0.2+0.25);
 
   gPad->Update();
 
-  c->SaveAs(("rootfiles/TEMP_ROC_Combined_"+fsave+".eps").c_str());
+  c->SaveAs(("plots/ROC_Combined_"+fsave+".eps").c_str());
 }
 
 void makeHistos_3bkg(){
@@ -303,14 +305,15 @@ void makeHistos_3bkg(){
   string postfix1; string postfix2;
   vector<string> labels;
 
-  //TFile *fs = new TFile("rootfiles/Rad_HHto4b_M800_13TeV_AOD_R08_r015_HiggsWin20_mc_subjets.root");
-  //TFile *fb1 = new TFile("rootfiles/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_HiggsWin20_mc_subjets.root");
-  //TFile *fb2 = new TFile("rootfiles/QCD_Pt-470to600_Tune4C_13TeV_pythia8_R08_r015_HiggsWin20_FULL_mc_subjets.root");
-  //postfix1="KtHW20fake001_3bkg";labels.push_back("#DeltaM_{H}=20, fake 1%");
-  TFile *fs = new TFile("rootfiles/Rad_HHto4b_M800_13TeV_AOD_R08_r015_KtMj_HiggsWin30_tagr06_fake02_BtagALLMj_MjIVF015_mc_subjets.root");
-  TFile *fb1 = new TFile("rootfiles/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_KtMj_HiggsWin30_tagr06_fake02_BtagALLMj_MjIVF015_mc_subjets.root");
-  TFile *fb2 = new TFile("rootfiles/QCD_Pt-470to600_Tune4C_13TeV_pythia8_R08_r015_KtMj_HiggsWin30_tagr06_fake02_BtagALLMj_MjIVF015_MORE_mc_subjets.root");
-  postfix1 = "KtHW30tag06fake02_3bkg";labels.push_back("#DeltaM_{H}=30, tag 60% fake 20%");
+  // TFile *fs = new TFile("rootfiles/Rad_HHto4b_M800_13TeV_AOD_R08_r015_HiggsWin20_mc_subjets.root");
+  // TFile *fb1 = new TFile("rootfiles/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_HiggsWin20_mc_subjets.root");
+  // TFile *fb2 = new TFile("rootfiles/QCD_Pt-470to600_Tune4C_13TeV_pythia8_R08_r015_HiggsWin20_FULL_mc_subjets.root");
+  // postfix1="KtHW20fake001_3bkg";labels.push_back("#DeltaM_{H}=20, fake 1%");
+
+  // TFile *fs = new TFile("rootfiles/Rad_HHto4b_M800_13TeV_AOD_R08_r015_KtMj_HiggsWin30_tagr06_fake02_BtagALLMj_MjIVF015_mc_subjets.root");
+  // TFile *fb1 = new TFile("rootfiles/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_KtMj_HiggsWin30_tagr06_fake02_BtagALLMj_MjIVF015_mc_subjets.root");
+  // TFile *fb2 = new TFile("rootfiles/QCD_Pt-470to600_Tune4C_13TeV_pythia8_R08_r015_KtMj_HiggsWin30_tagr06_fake02_BtagALLMj_MjIVF015_MORE_mc_subjets.root");
+  // postfix1 = "KtHW30tag06fake02_3bkg";labels.push_back("#DeltaM_{H}=30, tag 60% fake 20%");
   fsave1 = "logchi_"+postfix1;
   fsave2 = "pt_"+postfix1;
   Plot_3bkg(fs,fb1,fb2,"log(FatJetInfo.Jet_SD_chi)","FatJetInfo.Jet_pt>300&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_massGroomed>80&&FatJetInfo.Jet_massGroomed<150",fsave1,"Log(#chi)",40,-26,-6);
@@ -472,7 +475,8 @@ void ROC_1bkg(string fname,string fdenom,string fsave, const int xbin, double xm
   ROC->GetXaxis()->SetTitle("Eff_{sig}");
   ROC->GetYaxis()->SetTitle("1-Eff_{bkg}");
   ROC->GetXaxis()->SetLimits(0.,1.);
-  ROC->GetYaxis()->SetLimits(0.,1.);
+  //ROC->GetYaxis()->SetLimits(0.,1.);
+  ROC->SetMaximum(1.);ROC->SetMinimum(0.);
   ROC->SetTitle("ROC Curves");
 
   c->BuildLegend(0.2,0.2,0.2+0.2,0.2+0.15);
@@ -504,7 +508,8 @@ void ROC_combined_1bkg(string fname1, string fname2,string fsave, string label1,
   ROC->GetXaxis()->SetTitle("Eff_{sig}");
   ROC->GetYaxis()->SetTitle("1-Eff_{bkg}");
   ROC->GetXaxis()->SetLimits(0.,1.);
-  ROC->GetYaxis()->SetLimits(0.,1.);
+  //ROC->GetYaxis()->SetLimits(0.,1.);
+  ROC->SetMaximum(1.);ROC->SetMinimum(0.);
   ROC->SetTitle("ROC Curves");
 
   c->BuildLegend(0.2,0.2,0.2+0.3,0.2+0.25);
