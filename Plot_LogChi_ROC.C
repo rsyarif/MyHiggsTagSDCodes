@@ -532,10 +532,15 @@ void makeHistos_3bkg(){
   string postfix1; string postfix2;
   vector<string> labels;
 
-  TFile *fs = new TFile("rootfiles/Rad_HHto4b_M800_13TeV_AOD_R08_r015_HiggsWin20_mc_subjets.root");
-  TFile *fb1 = new TFile("rootfiles/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_HiggsWin20_mc_subjets.root");
-  TFile *fb2 = new TFile("rootfiles/QCD_Pt-300to470_Tune4C_13TeV_pythia8_R08_r015_KtMj_HiggsWin20_tagr07_fake001_BtagALLMj_MjIVF015_MORE_mc_subjets.root");
-  postfix1="KtHW20fake001_3bkg_QCD300470";labels.push_back("#DeltaM_{H}=20, fake 1%");
+  // TFile *fs = new TFile("rootfiles/Rad_HHto4b_M800_13TeV_AOD_R08_r015_HiggsWin20_mc_subjets.root");
+  // TFile *fb1 = new TFile("rootfiles/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_HiggsWin20_mc_subjets.root");
+  // TFile *fb2 = new TFile("rootfiles/QCD_Pt-300to470_Tune4C_13TeV_pythia8_R08_r015_KtMj_HiggsWin20_tagr07_fake001_BtagALLMj_MjIVF015_MORE_mc_subjets.root");
+  // postfix1="KtHW20fake001_3bkg_QCD300470";labels.push_back("#DeltaM_{H}=20, fake 1%");
+
+  TFile *fs = new TFile("rootfiles/Rad_HHto4b_M800_13TeV_AOD_R08_r015_KtMj_HiggsWin30_tagr06_fake02_BtagALLMj_MjIVF015_mc_subjets.root");
+  TFile *fb1 = new TFile("rootfiles/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_KtMj_HiggsWin30_tagr06_fake02_BtagALLMj_MjIVF015_mc_subjets.root");
+  TFile *fb2 = new TFile("rootfiles/QCD_Pt-300to470_Tune4C_13TeV_pythia8_R08_r015_KtMj_HiggsWin30_tagr06_fake02_BtagALLMj_MjIVF015_MORE_mc_subjets.root");
+  postfix1 = "KtHW30tag06fake02_3bkg_QCD300470";labels.push_back("#DeltaM_{H}=30, tag 60% fake 20%");
 
   // TFile *fs = new TFile("rootfiles/Rad_HHto4b_M800_13TeV_AOD_R08_r015_HiggsWin20_mc_subjets.root");
   // TFile *fb1 = new TFile("rootfiles/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_HiggsWin20_mc_subjets.root");
@@ -552,6 +557,7 @@ void makeHistos_3bkg(){
   Plot_3bkg(fs,fb1,fb2,"log(FatJetInfo.Jet_SD_chi)","FatJetInfo.Jet_pt>300&&FatJetInfo.Jet_SD_chi>0&&FatJetInfo.Jet_massGroomed>80&&FatJetInfo.Jet_massGroomed<150",fsave1,"Log(#chi)",40,-26,-6);
   Plot_3bkg(fs,fb1,fb2,"FatJetInfo.Jet_pt","FatJetInfo.Jet_pt>300&&FatJetInfo.Jet_massGroomed>80&&FatJetInfo.Jet_massGroomed<150",fsave2,"p_{T}",50,0,800);
   ROC_3bkg(fsave1,fsave2,postfix1,40,-26,-6);
+
 
   //TFile *fs_ = new TFile("rootfiles/Rad_HHto4b_M800_13TeV_AOD_R08_r015_AkMj_HiggsWin30_tagr07_fake02_BtagALLMj_MjIVF015_mc_subjets.root");
   //TFile *fb1_ = new TFile("rootfiles/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_R08_r015_AkMj_HiggsWin30_tagr07_fake02_BtagALLMj_MjIVF015_mc_subjets.root");
