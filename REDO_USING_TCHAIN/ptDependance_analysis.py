@@ -38,7 +38,7 @@ def efficiency1D(Tfpass, Tftotal, Tfpass_qcd, Tftotal_qcd, ptRange, var, fRebinX
     g_sig.SetMarkerSize(1.);
     g_sig.SetMarkerStyle(24);
     g_sig.SetMarkerColor(2);
-    g_sig.GetXaxis().SetRangeUser(300,1500)
+    g_sig.GetXaxis().SetRangeUser(300,1200)
     g_sig.GetHistogram().SetMaximum(1.1)
     g_sig.GetHistogram().SetMinimum(0.)
     g_sig.SetTitle("")
@@ -56,19 +56,19 @@ def efficiency1D(Tfpass, Tftotal, Tfpass_qcd, Tftotal_qcd, ptRange, var, fRebinX
     g_bkg.SetMarkerSize(1.);
     g_bkg.SetMarkerStyle(24);
     g_bkg.SetMarkerColor(kBlue+2);
-    g_bkg.GetXaxis().SetRangeUser(300,1500)
+    g_bkg.GetXaxis().SetRangeUser(300,1200)
 
     g_sig.Draw("AP");
     g_bkg.Draw("Psame");
 
 
-    legend = TLegend(.5,.8,.86,.85)
+    legend = TLegend(.45,.88-.1,.86,.88)
     # legend = TLegend(.16,.17,.3,.25)
     legend.SetBorderSize(0)
     legend.SetFillColor(0)
     legend.SetFillStyle(0)
     legend.SetTextFont(42)
-    legend.SetTextSize(0.03)
+    legend.SetTextSize(0.035)
     legend.AddEntry(g_sig,"log #chi - Rad->HH (M800-2000)",'lep')
     legend.AddEntry(g_bkg,"log #chi - QCD",'lep')
     legend.Draw()
@@ -84,8 +84,16 @@ def efficiency1D(Tfpass, Tftotal, Tfpass_qcd, Tftotal_qcd, ptRange, var, fRebinX
     l1.SetTextAlign(12)
     l1.SetTextSize(0.045)
     l1.SetTextFont(42)
-#     l1.DrawLatex(0.72,0.96, "CMS simulation (13 TeV)")
-    l1.DrawLatex(0.55,0.96, "CMS simulation (13 TeV)")
+#     l1.DrawLatex(0.72,0.93, "CMS simulation (13 TeV)")
+    l1.DrawLatex(0.75,0.94, "(13 TeV)")
+
+    l1.SetTextAlign(11)
+    l1.SetTextSize(0.045)
+    l1.SetTextFont(61)
+    l1.DrawLatex(0.1,0.93, "CMS")
+    l1.SetTextFont(52)
+    l1.DrawLatex(0.1+0.08,0.93, "simulation")
+
 
 
     l1.SetTextFont(42)

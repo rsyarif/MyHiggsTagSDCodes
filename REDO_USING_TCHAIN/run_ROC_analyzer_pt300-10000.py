@@ -1,7 +1,6 @@
 import os, sys
 from ROOT import *
 from ROC_analyzer import runAnalysis
-from combine_ROC import *
 
 
 sw = TStopwatch()

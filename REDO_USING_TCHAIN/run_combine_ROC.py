@@ -27,13 +27,13 @@ def run_combine_ROC(category,min,max):
 	
 	allROC(files, massCut, ptCut,category)
 
-# run_combine_ROC("_pt300-400",300,400)
-# run_combine_ROC("_pt400-500",400,500)
-# run_combine_ROC("_pt500-600",500,600)
-# run_combine_ROC("_pt600-800",600,800)
-# run_combine_ROC("_pt800-1000",800,1000)
-# run_combine_ROC("_pt1000-10000",1000,10000)
-run_combine_ROC("_pt300-10000",300,10000)
+run_combine_ROC("_pt300-400",300,400)
+run_combine_ROC("_pt400-500",400,500)
+run_combine_ROC("_pt500-600",500,600)
+run_combine_ROC("_pt600-800",600,800)
+run_combine_ROC("_pt800-1000",800,1000)
+run_combine_ROC("_pt1000-10000",1000,10000)
+# run_combine_ROC("_pt300-10000",300,10000)
 
 
 sw.Stop()

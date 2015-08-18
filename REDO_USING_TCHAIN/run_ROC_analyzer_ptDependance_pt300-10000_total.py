@@ -48,22 +48,22 @@ print " "
 # ch1.Add("/eos/uscms/store/user/rsyarif/SDstudies/QCD_Pt-300to470_Tune4C_13TeV_pythia8/QCDpt300_kT020_Hwin30_tag07_fake02/150706_204757/0000/*.root")
 # runAnalysis(ch1, w, fOut, massCut, ptCut, chiCut)
 
-print "Processing QCD470"
-ch2  = TChain("btaganaSubJets/ttree")
-fOut = TFile ("ROC_analyzer_QCD470_ptDependanceCalc_pt300-10000_total.root", "recreate")
-w = 587.1/2001071.
-print "Chaining files ..."
-ch2.Add("/eos/uscms/store/user/rsyarif/SDstudies/QCD_Pt-470to600_Tune4C_13TeV_pythia8/QCDpt470_kT020_Hwin30_tag07_fake02/150706_204846/0000/*.root")
-runAnalysis(ch2, w, fOut, massCut, ptCut, chiCut)
-
-print "Processing QCD600"
-ch3  = TChain("btaganaSubJets/ttree")
-fOut = TFile ("ROC_analyzer_QCD600_ptDependanceCalc_pt300-10000_total.root", "recreate")
-w = 167.0/2001071.
-w = 167.0/1952057.0 #(1 unfinished jobs)
-print "Chaining files ..."
-ch3.Add("/eos/uscms/store/user/rsyarif/SDstudies/QCD_Pt-600to800_Tune4C_13TeV_pythia8/QCDpt600_kT020_Hwin30_tag07_fake02/150717_210748/0000/*.root")
-runAnalysis(ch3, w, fOut, massCut, ptCut, chiCut)
+# print "Processing QCD470"
+# ch2  = TChain("btaganaSubJets/ttree")
+# fOut = TFile ("ROC_analyzer_QCD470_ptDependanceCalc_pt300-10000_total.root", "recreate")
+# w = 587.1/2001071.
+# print "Chaining files ..."
+# ch2.Add("/eos/uscms/store/user/rsyarif/SDstudies/QCD_Pt-470to600_Tune4C_13TeV_pythia8/QCDpt470_kT020_Hwin30_tag07_fake02/150706_204846/0000/*.root")
+# runAnalysis(ch2, w, fOut, massCut, ptCut, chiCut)
+# 
+# print "Processing QCD600"
+# ch3  = TChain("btaganaSubJets/ttree")
+# fOut = TFile ("ROC_analyzer_QCD600_ptDependanceCalc_pt300-10000_total.root", "recreate")
+# w = 167.0/2001071.
+# w = 167.0/1952057.0 #(1 unfinished jobs)
+# print "Chaining files ..."
+# ch3.Add("/eos/uscms/store/user/rsyarif/SDstudies/QCD_Pt-600to800_Tune4C_13TeV_pythia8/QCDpt600_kT020_Hwin30_tag07_fake02/150717_210748/0000/*.root")
+# runAnalysis(ch3, w, fOut, massCut, ptCut, chiCut)
 
 print "Processing QCD800"
 ch4  = TChain("btaganaSubJets/ttree")
