@@ -140,9 +140,13 @@ def makeROC(var,xmin, xmax,direction,category):
 # 		if (eff_hs >0.65 and eff_hs<0.85): print "(%f, %f)" %(eff_hs, 1-eff_hb2)
 # 		if (eff_hs >0.45 and eff_hs<0.65): print "(%f, %f)" %(eff_hs, 1-eff_hb2)
 
-		if (1-eff_hb1 >0.85 and 1-eff_hb1<0.95): print "at i = ", i, "(", xmin+inc*i ,")", "eff_s = ", eff_hs, ", rej_b = ", 1-eff_hb1 
-		if (1-eff_hb1 >0.45 and 1-eff_hb1<0.55): print "at i = ", i, "(", xmin+inc*i ,")", "eff_s = ", eff_hs, ", rej_b = ", 1-eff_hb1 
-		if (1-eff_hb1 >0.05 and 1-eff_hb1<0.15): print "at i = ", i, "(", xmin+inc*i ,")", "eff_s = ", eff_hs, ", rej_b = ", 1-eff_hb1 
+# 		if (1-eff_hb1 >0.85 and 1-eff_hb1<0.95): print "at i = ", i, "(", xmin+inc*i ,")", "eff_s = ", eff_hs, ", rej_b = ", 1-eff_hb1 
+# 		if (1-eff_hb1 >0.45 and 1-eff_hb1<0.55): print "at i = ", i, "(", xmin+inc*i ,")", "eff_s = ", eff_hs, ", rej_b = ", 1-eff_hb1 
+# 		if (1-eff_hb1 >0.05 and 1-eff_hb1<0.15): print "at i = ", i, "(", xmin+inc*i ,")", "eff_s = ", eff_hs, ", rej_b = ", 1-eff_hb1 
+
+		if (1-eff_hb2 >0.85 and 1-eff_hb2<0.95): print "at i = ", i, "(", xmin+inc*i ,")", "eff_s = ", eff_hs, ", rej_b = ", 1-eff_hb2 
+		if (1-eff_hb2 >0.45 and 1-eff_hb2<0.55): print "at i = ", i, "(", xmin+inc*i ,")", "eff_s = ", eff_hs, ", rej_b = ", 1-eff_hb2 
+		if (1-eff_hb2 >0.05 and 1-eff_hb2<0.15): print "at i = ", i, "(", xmin+inc*i ,")", "eff_s = ", eff_hs, ", rej_b = ", 1-eff_hb2 
 
 # 		print "at i = ", i, "(", xmin+inc*i ,")", "eff_s = ", eff_hs, ", rej_b = ", 1-eff_hb1 
 
