@@ -1,5 +1,7 @@
 #include "Plot_LogChi_ROC_TChain.h"
 
+// 300-470
+
 void makeHistos_3bkg_optimization_Hwin_300470(){
   vector<TString> chains; cout<< "Chaining files ..."<<endl;
   vector<string> postfix;
@@ -105,6 +107,73 @@ void makeHistos_3bkg_optimization_tag_300470(){
   makeHistos_3bkg_optimization(chains,postfix,labels,"300","470", info);
 }
 
+void makeHistos_3bkg_optimization_Hmass_300470(){
+  vector<TString> chains; cout<< "Chaining files ..."<<endl;
+  vector<string> postfix;
+  vector<string> labels;
+  TString info;
+
+  info = "signal: Rad->HH M800";
+  //1st set
+  postfix.push_back("RadM800_KtR020HW30tag07fake02_pt300470"); labels.push_back("m_{H} = 125 GeV");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/Rad_HHto4b_M800_13TeV/Rad_M800_kT020_Hwin30_tag07_fake02/150702_233636/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola/Zpr_M1000_kT020_Hwin30_tag07_fake02/150703_215948/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/QCD_Pt-300to470_Tune4C_13TeV_pythia8/QCDpt300_kT020_Hwin30_tag07_fake02/150706_204757/0000/*.root");
+  //2nd set
+  postfix.push_back("RadM800_KtR020HW30tag07fake02Hmass115_pt300470"); labels.push_back("m_{H} = 115 GeV");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/Rad_HHto4b_M800_13TeV/Rad_M800_kT020_Hwin30_tag07_fake02_HiggsM115/150825_215517/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola/Zpr_M1000_kT020_Hwin30_tag07_fake02_HiggsM115/150825_220459/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/QCD_Pt-300to470_Tune4C_13TeV_pythia8/QCDpt300_kT020_Hwin30_tag07_fake02_HiggsM115/150825_215926/0000/*.root"); 
+
+  makeHistos_3bkg_optimization(chains,postfix,labels,"300","470", info);
+}
+
+void makeHistos_3bkg_optimization_Hwin5030_300470(){
+  vector<TString> chains; cout<< "Chaining files ..."<<endl;
+  vector<string> postfix;
+  vector<string> labels;
+  TString info;
+
+  info = "signal: Rad->HH M800";
+  //1st set
+  postfix.push_back("RadM800_KtR020HW30tag07fake02_pt300470"); labels.push_back("#DeltaM_{H}=30");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/Rad_HHto4b_M800_13TeV/Rad_M800_kT020_Hwin30_tag07_fake02/150702_233636/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola/Zpr_M1000_kT020_Hwin30_tag07_fake02/150703_215948/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/QCD_Pt-300to470_Tune4C_13TeV_pythia8/QCDpt300_kT020_Hwin30_tag07_fake02/150706_204757/0000/*.root");
+  //2nd set
+  postfix.push_back("RadM800_KtR020HW50tag07fake02_pt300470"); labels.push_back("#DeltaM_{H}=50");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/Rad_HHto4b_M800_13TeV/crab_Rad_HHto4b_M800_13TeV_kT020_Hwin50_tag07_fake02/150827_171145/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola/crab_ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_kT020_Hwin50_tag07_fake02/150827_172027/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/QCD_Pt-300to470_Tune4C_13TeV_pythia8/crab_QCD_Pt-300to470_Tune4C_13TeV_pythia8_kT020_Hwin50_tag07_fake02/150827_171651/0000/*.root");
+
+  makeHistos_3bkg_optimization(chains,postfix,labels,"300","470", info);
+}
+
+void makeHistos_3bkg_optimization_Hwin3020_kT20_300470(){
+  vector<TString> chains; cout<< "Chaining files ..."<<endl;
+  vector<string> postfix;
+  vector<string> labels;
+  TString info;
+
+  info = "signal: Rad->HH M800";
+  //1st set
+  //1st set
+  postfix.push_back("RadM800_KtR020HW30tag07fake02_pt300470"); labels.push_back("#DeltaM_{H}=30");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/Rad_HHto4b_M800_13TeV/Rad_M800_kT020_Hwin30_tag07_fake02/150702_233636/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola/Zpr_M1000_kT020_Hwin30_tag07_fake02/150703_215948/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/QCD_Pt-300to470_Tune4C_13TeV_pythia8/QCDpt300_kT020_Hwin30_tag07_fake02/150706_204757/0000/*.root");
+  //2nd set
+  postfix.push_back("RadM800_KtR020HW20tag07fake02_pt300470"); labels.push_back("#DeltaM_{H}=20");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/Rad_HHto4b_M800_13TeV/crab_Rad_HHto4b_M800_13TeV_kT020_Hwin20_tag07_fake02/150828_174808/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola/crab_ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_kT020_Hwin20_tag07_fake02/150828_175548/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/QCD_Pt-300to470_Tune4C_13TeV_pythia8/crab_QCD_Pt-300to470_Tune4C_13TeV_pythia8_kT020_Hwin20_tag07_fake02/150828_175130/0000/*.root");
+
+  makeHistos_3bkg_optimization(chains,postfix,labels,"300","470", info);
+}
+
+
+// 470 - 600
+
 void makeHistos_3bkg_optimization_Hwin_470600(){
   vector<TString> chains; cout<< "Chaining files ..."<<endl;
   vector<string> postfix;
@@ -209,6 +278,72 @@ void makeHistos_3bkg_optimization_tag_470600(){
 
   makeHistos_3bkg_optimization(chains,postfix,labels,"470","600", info);
 }
+
+void makeHistos_3bkg_optimization_Hmass_470600(){
+  vector<TString> chains; cout<< "Chaining files ..."<<endl;
+  vector<string> postfix;
+  vector<string> labels;
+  TString info;
+
+  info = "signal: Rad->HH M800";
+  //1st set
+  postfix.push_back("RadM800_KtR020HW30tag07fake02_pt470600"); labels.push_back("m_{H} = 125 GeV");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/Rad_HHto4b_M800_13TeV/Rad_M800_kT020_Hwin30_tag07_fake02/150702_233636/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola/Zpr_M1000_kT020_Hwin30_tag07_fake02/150703_215948/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/QCD_Pt-470to600_Tune4C_13TeV_pythia8/QCDpt470_kT020_Hwin30_tag07_fake02/150706_204846/0000/*.root");
+  //2nd set
+  postfix.push_back("RadM800_KtR020HW30tag07fake02Hmass115_pt470600"); labels.push_back("m_{H} = 115 GeV");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/Rad_HHto4b_M800_13TeV/Rad_M800_kT020_Hwin30_tag07_fake02_HiggsM115/150825_215517/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola/Zpr_M1000_kT020_Hwin30_tag07_fake02_HiggsM115/150825_220459/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/QCD_Pt-470to600_Tune4C_13TeV_pythia8/QCDpt470_kT020_Hwin30_tag07_fake02_HiggsM115/150825_220001/0000/*.root"); 
+
+  makeHistos_3bkg_optimization(chains,postfix,labels,"470","600", info);
+}
+
+void makeHistos_3bkg_optimization_Hwin5030_470600(){
+  vector<TString> chains; cout<< "Chaining files ..."<<endl;
+  vector<string> postfix;
+  vector<string> labels;
+  TString info;
+
+  info = "signal: Rad->HH M800";
+  //1st set
+  postfix.push_back("RadM800_KtR020HW30tag07fake02_pt470600"); labels.push_back("#DeltaM_{H}=30");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/Rad_HHto4b_M800_13TeV/Rad_M800_kT020_Hwin30_tag07_fake02/150702_233636/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola/Zpr_M1000_kT020_Hwin30_tag07_fake02/150703_215948/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/QCD_Pt-470to600_Tune4C_13TeV_pythia8/QCDpt470_kT020_Hwin30_tag07_fake02/150706_204846/0000/*.root");
+  //2nd set
+  postfix.push_back("RadM800_KtR020HW50tag07fake02_pt470600"); labels.push_back("#DeltaM_{H}=50");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/Rad_HHto4b_M800_13TeV/crab_Rad_HHto4b_M800_13TeV_kT020_Hwin50_tag07_fake02/150827_171145/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola/crab_ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_kT020_Hwin50_tag07_fake02/150827_172027/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/QCD_Pt-470to600_Tune4C_13TeV_pythia8/crab_QCD_Pt-470to600_Tune4C_13TeV_pythia8_kT020_Hwin50_tag07_fake02/150827_171715/0000/*.root");
+
+  makeHistos_3bkg_optimization(chains,postfix,labels,"470","600", info);
+}
+
+void makeHistos_3bkg_optimization_Hwin3020_kT20_470600(){
+  vector<TString> chains; cout<< "Chaining files ..."<<endl;
+  vector<string> postfix;
+  vector<string> labels;
+  TString info;
+
+  info = "signal: Rad->HH M800";
+  //1st set
+  postfix.push_back("RadM800_KtR020HW30tag07fake02_pt470600"); labels.push_back("#DeltaM_{H}=30");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/Rad_HHto4b_M800_13TeV/Rad_M800_kT020_Hwin30_tag07_fake02/150702_233636/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola/Zpr_M1000_kT020_Hwin30_tag07_fake02/150703_215948/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/QCD_Pt-470to600_Tune4C_13TeV_pythia8/QCDpt470_kT020_Hwin30_tag07_fake02/150706_204846/0000/*.root");
+   //2nd set
+  postfix.push_back("RadM800_KtR020HW20tag07fake02_pt470600"); labels.push_back("#DeltaM_{H}=20");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/Rad_HHto4b_M800_13TeV/crab_Rad_HHto4b_M800_13TeV_kT020_Hwin20_tag07_fake02/150828_174808/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola/crab_ZPrimeToTTJets_M1000GeV_W10GeV_Tune4C_13TeV-madgraph-tauola_kT020_Hwin20_tag07_fake02/150828_175548/0000/*.root");
+  chains.push_back("/eos/uscms/store/user/rsyarif/SDstudies/QCD_Pt-470to600_Tune4C_13TeV_pythia8/crab_QCD_Pt-470to600_Tune4C_13TeV_pythia8_kT020_Hwin20_tag07_fake02/150828_175250/0000/*.root");
+ 
+  makeHistos_3bkg_optimization(chains,postfix,labels,"470","600", info);
+}
+
+
+//compare jetsubstructure
 
 void makeHistos_3bkg_compareSubstructure_300470(){
 
@@ -388,17 +523,24 @@ void makeHistos_3bkg_compareSubstructure_opt_470600(){
 
 
 void Alakazam(){
-  makeHistos_3bkg_optimization_Hwin_300470();
-  makeHistos_3bkg_optimization_fake_300470();
-  makeHistos_3bkg_optimization_MjCone10_300470();
-  makeHistos_3bkg_optimization_MjCone20_300470();
-  makeHistos_3bkg_optimization_tag_300470();
-  
-  makeHistos_3bkg_optimization_Hwin_470600();
-  makeHistos_3bkg_optimization_fake_470600();
-  makeHistos_3bkg_optimization_MjCone10_470600();
-  makeHistos_3bkg_optimization_MjCone20_470600();
-  makeHistos_3bkg_optimization_tag_470600();
+//   makeHistos_3bkg_optimization_Hwin_300470();
+  makeHistos_3bkg_optimization_Hwin3020_kT20_300470();
+  makeHistos_3bkg_optimization_Hwin5030_300470();
+//   makeHistos_3bkg_optimization_fake_300470();
+//   makeHistos_3bkg_optimization_MjCone10_300470();
+//   makeHistos_3bkg_optimization_MjCone20_300470();
+//   makeHistos_3bkg_optimization_tag_300470();
+//   makeHistos_3bkg_optimization_Hmass_300470();
+
+//   makeHistos_3bkg_optimization_Hwin_470600();
+  makeHistos_3bkg_optimization_Hwin3020_kT20_470600();
+  makeHistos_3bkg_optimization_Hwin5030_470600();
+//   makeHistos_3bkg_optimization_fake_470600();
+//   makeHistos_3bkg_optimization_MjCone10_470600();
+//   makeHistos_3bkg_optimization_MjCone20_470600();
+//   makeHistos_3bkg_optimization_tag_470600();
+//   makeHistos_3bkg_optimization_Hmass_470600();
+
 //   
 //   makeHistos_3bkg_compareSubstructure_300470();
 //   makeHistos_3bkg_compareSubstructure_470600();

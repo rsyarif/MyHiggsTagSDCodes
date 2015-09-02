@@ -761,7 +761,8 @@ void makeHistos_3bkg_optimization(vector<TString> chains, vector<string> postfix
   string massCut; string ptCut;
   vector<string> fsave; vector<string> fsave2;
 
-  string minMass = "80", maxMass = "150";//, minPt = "300", maxPt = "470";
+//   string minMass = "80", maxMass = "150";//, minPt = "300", maxPt = "470";
+  string minMass = "50", maxMass = "200";
   string massType = "Groomed";
   massCut = "FatJetInfo.Jet_mass"+massType+">"+minMass+"&&FatJetInfo.Jet_mass"+massType+"<"+maxMass;
   ptCut = "FatJetInfo.Jet_pt>"+minPt+"&&FatJetInfo.Jet_pt<"+maxPt;
